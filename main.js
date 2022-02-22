@@ -1,11 +1,12 @@
 let os = require('os');
 let child;
 let fails = 0;
-let goBinary = "./mainnet-commitments-ui.exe"; //or template.exe
+let goBinary = "./mainnet-commitments-ui"; //or template.exe
 
 function setPage(html) {
     const container = document.getElementById("app");
-    app.innerHTML = html;
+    container.innerHTML = html;
+
     // Set focus for autofocus element
     let elem = document.querySelector("input[autofocus]");
     if (elem != null) {
@@ -21,7 +22,7 @@ function start_process() {
     body_message("Loading...");
 
     const spawn = require('child_process').spawn;
-    child = spawn(goBinary, {maxBuffer: 1024 * 500});
+    child = spawn(goBinary);
 
     const readline = require('readline');
     const rl = readline.createInterface({
@@ -32,7 +33,7 @@ function start_process() {
         console.log(`Received: ${data}`);
 
         if (data.charAt(0) === "$") {
-            data = data.substr(1);
+            data = data.substring(1);
             eval(data);
         } else {
             setPage(data);
@@ -49,7 +50,7 @@ function start_process() {
     });
 
     child.on('error', (err) => {
-        body_message('Failed to start child process.');
+        body_message('Failed to start child process: ' + err);
         restart_process();
     });
 }
@@ -103,7 +104,7 @@ function fire_event(name, sender) {
     console.log(JSON.stringify(msg));
 }
 
-function fire_keypressed_event(e, keycode, name, sender) {
+function fire_keyPressed_event(e, keycode, name, sender) {
     if (e.keyCode === keycode) {
         e.preventDefault();
         fire_event(name, sender);

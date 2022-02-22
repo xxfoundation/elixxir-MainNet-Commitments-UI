@@ -16,3 +16,8 @@
 
 # Dependency directories (remove the comment below to include it)
 vendor/
+
+
+mainnet-commitments-client.log
+mainnet-commitments-ui
+mainnet-commitments-ui.exe
