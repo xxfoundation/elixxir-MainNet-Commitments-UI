@@ -12,8 +12,8 @@ import (
 // <p class="help-block">Example block-level help text here.</p>
 // </div>
 
-// FormInput is a bootstrap "form-group" input
-type FormInput struct {
+// FileButton is a bootstrap "form-group" input
+type FileButton struct {
 	*gowd.Element
 	input   *gowd.Element
 	txt     *gowd.Element
@@ -21,9 +21,9 @@ type FormInput struct {
 	helpTxt *gowd.Element
 }
 
-// NewFormInput creates a bootstrap "form-group" containing an input with a given type and caption
-func NewFormInput(caption string, value *string) *FormInput {
-	i := new(FormInput)
+// NewFileButton creates a bootstrap "form-group" containing an input with a given type and caption
+func NewFileButton(caption string, value *string) *FileButton {
+	i := new(FileButton)
 	i.Element = bootstrap.NewElement("div", "form-group")
 
 	i.lbl2 = gowd.NewElement("label")
@@ -41,8 +41,6 @@ func NewFormInput(caption string, value *string) *FormInput {
 
 	i.input = bootstrap.NewElement("input", "form-control fileInput")
 	i.input.SetAttribute("type", "file")
-	// i.input.SetAttribute("style", "display:none;")
-	// i.input.SetAttribute("style", "visibility:hidden;")
 	i.input.SetAttribute("style", "width:0;height:0;padding:0;border:0;")
 	i.helpTxt = bootstrap.NewElement("p", "help-block")
 
@@ -67,32 +65,32 @@ func NewFormInput(caption string, value *string) *FormInput {
 }
 
 // SetPlaceHolder sets the input placeholder text
-func (i *FormInput) SetPlaceHolder(placeHolder string) {
+func (i *FileButton) SetPlaceHolder(placeHolder string) {
 	i.input.SetAttribute("placeHolder", placeHolder)
 }
 
 // SetHelpText sets the input help text
-func (i *FormInput) SetHelpText(help string) {
+func (i *FileButton) SetHelpText(help string) {
 	i.helpTxt.SetText(help)
 	i.helpTxt.Hidden = false
 }
 
 // HideHelpText hides the input help text
-func (i *FormInput) HideHelpText() {
+func (i *FileButton) HideHelpText() {
 	i.helpTxt.Hidden = true
 }
 
 // SetValue sets the input value
-func (i *FormInput) SetValue(value string) {
+func (i *FileButton) SetValue(value string) {
 	i.input.SetAttribute("value", value)
 }
 
 // GetValue returns the input value
-func (i *FormInput) GetValue() string {
+func (i *FileButton) GetValue() string {
 	return i.input.GetValue()
 }
 
 // SetFile sets the input file value
-func (i *FormInput) SetFile(value string) {
+func (i *FileButton) SetFile(value string) {
 	i.lbl2.SetText(value)
 }

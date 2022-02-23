@@ -4,7 +4,7 @@
 	"single-instance": true,
 	"window": {
 		"position": "center",
-		"width": 850,
+		"width": 995,
 		"height": 750,
 		"frame": true,
 		"icon": "img/favicon-32x32.png"
