@@ -12,6 +12,8 @@ import (
 
 var body *gowd.Element
 
+const blurbText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus malesuada eleifend ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam pretium tempor massa, a volutpat orci mattis non. Integer tincidunt tincidunt ante sed cursus. In lacinia pulvinar tempor. Nullam id luctus nibh, vitae iaculis ante. Integer vel sem at augue viverra suscipit vel nec orci. Sed sed ultrices quam. Vestibulum hendrerit tellus justo, id tempus enim fringilla quis. Vivamus nunc ante, tincidunt et tellus eget, varius lobortis tortor. Maecenas in porta erat. Nam in dolor turpis. Aliquam a tristique arcu, vitae pulvinar tellus. Sed nec imperdiet mi, vel maximus est. Nunc aliquet eros arcu, quis faucibus nibh feugiat a. Fusce id orci nunc.\n\n"
+
 func buildPage() error {
 
 	inputs := Inputs{}
@@ -20,82 +22,80 @@ func buildPage() error {
 	body = bootstrap.NewContainer(false)
 	// add some elements using the object model
 
-	jww.ERROR.Printf("PAGE LOADED")
-
 	// keyPathInput := bootstrap.NewFileButton(bootstrap.ButtonDefault, "keyPath", false)
-	keyPathInput := bootstrap.NewFormInput("file", "keyPath")
-	keyPathInput.SetValue("test")
-	idfPathInput := bootstrap.NewFormInput("file", "idfPath")
+	keyPathInput := NewFormInput("keyPath", &inputs.keyPath)
+	idfPathInput := NewFormInput("idfPath", &inputs.idfPath)
 	nominatorWalletInput := bootstrap.NewFormInput("text", "nominatorWallet")
 	validatorWalletInput := bootstrap.NewFormInput("text", "validatorWallet")
 	serverAddressInput := bootstrap.NewFormInput("text", "serverAddress")
-	serverCertPathInput := bootstrap.NewFormInput("file", "serverCertPath")
-	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "button")
+	serverCertPathInput := NewFormInput("serverCertPath", &inputs.serverCertPath)
+	agreeInput := bootstrap.NewCheckBox("Agree", false)
+	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
 
-	errBox := bootstrap.NewElement("div", "well")
+	errBox := bootstrap.NewElement("span", "errorBox")
+	errBox.Hidden = true
 
-	// keyPathInput.OnEvent(gowd.OnChange, func(sender *gowd.Element, event *gowd.EventElement) {
-	// 	jww.INFO.Printf("keyPath sender: %+v", sender)
-	// 	jww.INFO.Printf("keyPath event: %+v", event)
-	// 	inputs.keyPath = keyPathInput.GetValue()
-	// 	jww.INFO.Printf("keyPath set: %q", inputs.keyPath)
-	// })
-	// idfPathInput.OnEvent(gowd.OnChange, func(_ *gowd.Element, event *gowd.EventElement) {
-	// 	inputs.idfPath = event.GetValue()
-	// 	jww.INFO.Printf("idfPath set: %q", inputs.idfPath)
-	// })
-	// nominatorWalletInput.OnEvent(gowd.OnChange, func(_ *gowd.Element, event *gowd.EventElement) {
-	// 	inputs.nominatorWallet = event.GetValue()
-	// 	jww.INFO.Printf("nominatorWallet set: %q", inputs.nominatorWallet)
-	// })
-	// validatorWalletInput.OnEvent(gowd.OnChange, func(_ *gowd.Element, event *gowd.EventElement) {
-	// 	inputs.validatorWallet = event.GetValue()
-	// 	jww.INFO.Printf("validatorWallet set: %q", inputs.validatorWallet)
-	// })
-	// serverAddressInput.OnEvent(gowd.OnChange, func(_ *gowd.Element, event *gowd.EventElement) {
-	// 	inputs.serverAddress = event.GetValue()
-	// 	jww.INFO.Printf("serverAddress set: %q", inputs.serverAddress)
-	// })
-	// serverCertPathInput.OnEvent(gowd.OnChange, func(_ *gowd.Element, event *gowd.EventElement) {
-	// 	inputs.serverCertPath = event.GetValue()
-	// 	jww.INFO.Printf("serverCertPath set: %q", inputs.serverCertPath)
-	// })
 	submit.OnEvent(gowd.OnClick, func(_ *gowd.Element, event *gowd.EventElement) {
 		var errs int
-		inputs.keyPath = keyPathInput.GetValue()
 		if len(inputs.keyPath) == 0 {
 			keyPathInput.SetHelpText("Required.")
 			errs++
+		} else {
+			keyPathInput.HideHelpText()
 		}
-		inputs.idfPath = keyPathInput.GetValue()
 		if len(inputs.idfPath) == 0 {
 			idfPathInput.SetHelpText("Required.")
 			errs++
+		} else {
+			idfPathInput.HideHelpText()
 		}
 		inputs.nominatorWallet = nominatorWalletInput.GetValue()
 		if len(inputs.nominatorWallet) == 0 {
 			nominatorWalletInput.SetHelpText("Required.")
 			errs++
+		} else {
+			if len(nominatorWalletInput.Kids) > 2 {
+				nominatorWalletInput.RemoveElement(nominatorWalletInput.Kids[2])
+			}
 		}
 		inputs.validatorWallet = validatorWalletInput.GetValue()
 		if len(inputs.validatorWallet) == 0 {
 			validatorWalletInput.SetHelpText("Required.")
 			errs++
+		} else {
+			if len(validatorWalletInput.Kids) > 2 {
+				validatorWalletInput.RemoveElement(validatorWalletInput.Kids[2])
+			}
 		}
 		inputs.serverAddress = serverAddressInput.GetValue()
 		if len(inputs.serverAddress) == 0 {
 			serverAddressInput.SetHelpText("Required.")
 			errs++
+		} else {
+			if len(serverAddressInput.Kids) > 2 {
+				serverAddressInput.RemoveElement(serverAddressInput.Kids[2])
+			}
 		}
-		inputs.serverCertPath = serverCertPathInput.GetValue()
 		if len(inputs.serverCertPath) == 0 {
 			serverCertPathInput.SetHelpText("Required.")
 			errs++
+		} else {
+			serverCertPathInput.HideHelpText()
+		}
+		inputs.agree = agreeInput.Checked()
+		if inputs.agree == false {
+			// TODO: print error
+			errs++
+		} else {
+			if len(serverAddressInput.Kids) > 2 {
+				serverAddressInput.RemoveElement(serverAddressInput.Kids[2])
+			}
 		}
 		jww.INFO.Printf("Inputs set: %+v", inputs)
 
 		if errs == 0 {
-			err := client.SignAndTransmit(inputs.keyPath,
+			err := client.SignAndTransmit(
+				inputs.keyPath,
 				inputs.idfPath,
 				inputs.nominatorWallet,
 				inputs.validatorWallet,
@@ -104,9 +104,16 @@ func buildPage() error {
 				utils.Contract)
 			if err != nil {
 				errBox.SetText(err.Error())
+				errBox.Hidden = false
 			}
 		}
 	})
+
+	contract := bootstrap.NewElement("div", "contractContainer")
+	_, err := contract.AddHTML(utils.Contract, nil)
+	if err != nil {
+		return err
+	}
 
 	form := bootstrap.NewFormGroup(
 		keyPathInput.Element,
@@ -115,12 +122,24 @@ func buildPage() error {
 		validatorWalletInput.Element,
 		serverAddressInput.Element,
 		serverCertPathInput.Element,
-		submit)
+		contract,
+		agreeInput.Element,
+		submit,
+		errBox,
+	)
 
-	row := bootstrap.NewRow(bootstrap.NewColumn(bootstrap.ColumnSmall, 3, bootstrap.NewColumn(bootstrap.ColumnSmall, 3, bootstrap.NewElement("div", "well", form), errBox)))
+	h1 := bootstrap.NewElement("h1", "")
+	h1.SetText("MainNet Commitments")
+	logo := bootstrap.NewElement("img", "logo")
+	logo.SetAttribute("src", "img/xx-logo.svg")
+	h1.AddElement(logo)
+	p := bootstrap.NewElement("p", "blurb")
+	p.SetText(blurbText)
+	row := bootstrap.NewRow(bootstrap.NewElement("div", "well", h1, p, form))
 	body.AddElement(row)
+
 	// Start the UI loop
-	err := gowd.Run(body)
+	err = gowd.Run(body)
 	if err != nil {
 		return err
 	}
@@ -130,6 +149,7 @@ func buildPage() error {
 
 type Inputs struct {
 	keyPath, idfPath, nominatorWallet, validatorWallet, serverAddress, serverCertPath string
+	agree                                                                             bool
 }
 
 // happens when the 'start' button is clicked

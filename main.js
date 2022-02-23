@@ -1,7 +1,8 @@
 let os = require('os');
 let child;
 let fails = 0;
-let goBinary = "./mainnet-commitments-ui"; //or template.exe
+let goBinary = "./mainnet-commitments-ui";
+let args = ["-v=2", "-l=mainnet-commitments-ui.log"]
 
 function setPage(html) {
     const container = document.getElementById("app");
@@ -22,7 +23,7 @@ function start_process() {
     body_message("Loading...");
 
     const spawn = require('child_process').spawn;
-    child = spawn(goBinary);
+    child = spawn(goBinary, args);
 
     const readline = require('readline');
     const rl = readline.createInterface({

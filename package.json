@@ -4,8 +4,8 @@
 	"single-instance": true,
 	"window": {
 		"position": "center",
-		"width": 650,
-		"height": 433,
+		"width": 850,
+		"height": 750,
 		"frame": true,
 		"icon": "img/favicon-32x32.png"
 	},

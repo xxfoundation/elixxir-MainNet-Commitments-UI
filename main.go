@@ -31,46 +31,61 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		initLog(logPath, logLevel)
 
-		buildPage()
+		err := buildPage()
+		if err != nil {
+			jww.FATAL.Panic(err)
+		}
 	},
 }
 
 // init is the initialization function for Cobra which defines commands and
 // flags.
 func init() {
-	rootCmd.Flags().StringVarP(&logPath, "logPath", "l",
-		"./mainnet-commitments-client.log", "File path to save log file to.")
+	rootCmd.Flags().StringVarP(&logPath, "logPath", "l", "",
+		"File path to save log file to.")
 	rootCmd.Flags().IntVarP(&logLevel, "logLevel", "v", 0,
 		"Verbosity level for log printing (2+ = Trace, 1 = Debug, 0 = Info).")
 }
 
-// initLog initializes logging thresholds and the log path.
+// initLog initializes logging thresholds and the log path. If not path is
+// provided, the log output is not set. Possible values for logLevel:
+//  0  = info
+//  1  = debug
+//  2+ = trace
 func initLog(logPath string, logLevel int) {
+	// Set log level to highest verbosity while setting up log files
+	jww.SetLogThreshold(jww.LevelTrace)
+	jww.SetStdoutThreshold(jww.LevelTrace)
 
 	// Set log file output
-	logFile, err := os.OpenFile(
-		logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-	if err != nil {
-		fmt.Printf("Could not open log file %q: %+v\n", logPath, err)
+	if logPath != "" {
+		logFile, err := os.OpenFile(
+			logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+		if err != nil {
+			jww.ERROR.Printf("Could not open log file %q: %+v\n", logPath, err)
+		} else {
+			jww.INFO.Printf("Setting log output to %q", logPath)
+			jww.SetLogOutput(logFile)
+		}
 	} else {
-		jww.SetLogOutput(logFile)
+		jww.INFO.Printf("No log output set: no log path provided")
 	}
 
-	// Check the level of logs to display
+	// Select the level of logs to display
+	var threshold jww.Threshold
 	if logLevel > 1 {
 		// Turn on trace logs
-		jww.SetLogThreshold(jww.LevelTrace)
-		jww.SetStdoutThreshold(jww.LevelTrace)
-		jww.INFO.Printf("Log level set to: %s", jww.LevelTrace)
+		threshold = jww.LevelTrace
 	} else if logLevel == 1 {
 		// Turn on debugging logs
-		jww.SetLogThreshold(jww.LevelDebug)
-		jww.SetStdoutThreshold(jww.LevelDebug)
-		jww.INFO.Printf("Log level set to: %s", jww.LevelDebug)
+		threshold = jww.LevelDebug
 	} else {
 		// Turn on info logs
-		jww.SetLogThreshold(jww.LevelInfo)
-		jww.SetStdoutThreshold(jww.LevelInfo)
-		jww.INFO.Printf("Log level set to: %s", jww.LevelInfo)
+		threshold = jww.LevelInfo
 	}
+
+	// Set logging thresholds
+	jww.SetLogThreshold(threshold)
+	jww.SetStdoutThreshold(threshold)
+	jww.INFO.Printf("Log level set to: %s", threshold)
 }
