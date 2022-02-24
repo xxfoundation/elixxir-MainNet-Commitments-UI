@@ -1,19 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"git.xx.network/elixxir/mainnet-commitments/client"
 	"git.xx.network/elixxir/mainnet-commitments/utils"
 	"github.com/dtylman/gowd"
 	"github.com/dtylman/gowd/bootstrap"
 	jww "github.com/spf13/jwalterweatherman"
 	utils2 "gitlab.com/xx_network/primitives/utils"
-	"time"
 )
 
 var body *gowd.Element
 
 const blurbText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus malesuada eleifend ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam pretium tempor massa, a volutpat orci mattis non. Integer tincidunt tincidunt ante sed cursus. In lacinia pulvinar tempor. Nullam id luctus nibh, vitae iaculis ante. Integer vel sem at augue viverra suscipit vel nec orci. Sed sed ultrices quam. Vestibulum hendrerit tellus justo, id tempus enim fringilla quis. Vivamus nunc ante, tincidunt et tellus eget, varius lobortis tortor. Maecenas in porta erat. Nam in dolor turpis. Aliquam a tristique arcu, vitae pulvinar tellus. Sed nec imperdiet mi, vel maximus est. Nunc aliquet eros arcu, quis faucibus nibh feugiat a. Fusce id orci nunc.\n\n"
+const serverAddress = "http://localhost:11420"
+
+type Inputs struct {
+	keyPath         string
+	idfPath         string
+	nominatorWallet string
+	validatorWallet string
+	serverCert      string
+	serverCertPath  string
+	agree           bool
+}
 
 func buildPage() error {
 
@@ -24,14 +33,13 @@ func buildPage() error {
 	// add some elements using the object model
 
 	// keyPathInput := bootstrap.NewFileButton(bootstrap.ButtonDefault, "keyPath", false)
-	keyPathInput := NewFileButton("keyPath", &inputs.keyPath)
-	idfPathInput := NewFileButton("idfPath", &inputs.idfPath)
-	nominatorWalletInput := bootstrap.NewFormInput("text", "nominatorWallet")
-	validatorWalletInput := bootstrap.NewFormInput("text", "validatorWallet")
-	serverAddressInput := bootstrap.NewFormInput("text", "serverAddress")
-	serverCertPathInput := NewFileButton("serverCertPath", &inputs.serverCertPath)
+	keyPathInput := NewFileButton("Server Key (.key)", &inputs.keyPath)
+	idfPathInput := NewFileButton("IDF (.json)", &inputs.idfPath)
+	nominatorWalletInput := bootstrap.NewFormInput("text", "Nominator Wallet Address")
+	validatorWalletInput := bootstrap.NewFormInput("text", "Validator Wallet Address")
+	serverCertPathInput := NewFileButton("BetaNet Server Certificate (.crt)", &inputs.serverCertPath)
 
-	agreeInput := bootstrap.NewCheckBox("agree", false)
+	agreeInput := bootstrap.NewCheckBox("I agree to the contract above.", false)
 	agreeHelpText := bootstrap.NewElement("p", "help-block")
 	agreeHelpText.Hidden = true
 	agreeBox := bootstrap.NewElement("div", "form-group", agreeInput.Element, agreeHelpText)
@@ -39,7 +47,9 @@ func buildPage() error {
 	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
 	errBox := bootstrap.NewElement("span", "errorBox")
 	errBox.Hidden = true
-	submitBox := bootstrap.NewElement("div", "", submit, errBox)
+	spinner := bootstrap.NewElement("div", "spinnerContainer", bootstrap.NewElement("div", "spinner", gowd.NewText("Loading...")))
+	spinner.Hidden = true
+	submitBox := bootstrap.NewElement("div", "", errBox, spinner, submit)
 	submitBox.SetAttribute("style", "text-align:center;")
 
 	formErrors := bootstrap.NewElement("p", "formErrors")
@@ -48,6 +58,12 @@ func buildPage() error {
 	divWell := bootstrap.NewElement("div", "well")
 
 	submit.OnEvent(gowd.OnClick, func(_ *gowd.Element, event *gowd.EventElement) {
+		submit.Disable()
+		body.Disable()
+		defer func() {
+			body.Enable()
+			submit.Enable()
+		}()
 		var errs int
 		if len(inputs.keyPath) == 0 {
 			keyPathInput.SetHelpText("Required.")
@@ -92,15 +108,6 @@ func buildPage() error {
 				validatorWalletInput.Kids[2].Hidden = true
 			}
 		}
-		inputs.serverAddress = serverAddressInput.GetValue()
-		if len(inputs.serverAddress) == 0 {
-			serverAddressInput.SetHelpText("Required.")
-			errs++
-		} else {
-			if len(serverAddressInput.Kids) > 2 {
-				serverAddressInput.Kids[2].Hidden = true
-			}
-		}
 		if len(inputs.serverCertPath) == 0 {
 			serverCertPathInput.SetHelpText("Required.")
 			errs++
@@ -126,16 +133,26 @@ func buildPage() error {
 		}
 		jww.INFO.Printf("Inputs set: %+v", inputs)
 
-		if errs == 0 {
+		if errs >= 0 {
+			spinner.Hidden = false
 			formErrors.Hidden = true
+			errBox.Hidden = true
+
+			if err := body.Render(); err != nil {
+				jww.ERROR.Print(err)
+			}
+
 			err := client.SignAndTransmit(
 				inputs.keyPath,
 				inputs.idfPath,
 				inputs.nominatorWallet,
 				inputs.validatorWallet,
-				inputs.serverAddress,
+				serverAddress,
 				inputs.serverCert,
 				utils.Contract)
+
+			spinner.Hidden = true
+
 			if err != nil {
 				jww.ERROR.Printf("Submit error: %+v", err)
 				errBox.SetText(err.Error())
@@ -147,7 +164,6 @@ func buildPage() error {
 				success := bootstrap.NewElement("span", "success", gowd.NewText("MainNet Commitments Successful."))
 				divWell.AddElement(success)
 			}
-
 		} else {
 			formErrors.SetText("The were errors in the form input. Please correct them to continue.")
 			formErrors.Hidden = false
@@ -163,12 +179,11 @@ func buildPage() error {
 
 	form := bootstrap.NewFormGroup(
 		formErrors,
+		serverCertPathInput.Element,
 		keyPathInput.Element,
 		idfPathInput.Element,
 		nominatorWalletInput.Element,
 		validatorWalletInput.Element,
-		serverAddressInput.Element,
-		serverCertPathInput.Element,
 		contractText,
 		contract,
 		agreeBox,
@@ -197,39 +212,4 @@ func buildPage() error {
 	}
 
 	return nil
-}
-
-type Inputs struct {
-	keyPath, idfPath, nominatorWallet, validatorWallet, serverAddress, serverCert, serverCertPath string
-	agree                                                                                         bool
-}
-
-// happens when the 'start' button is clicked
-func btnClicked(sender *gowd.Element, event *gowd.EventElement) {
-	// adds a text and progress bar to the body
-	sender.SetText("Working...")
-	text := body.AddElement(gowd.NewStyledText("Working...", gowd.BoldText))
-	progressBar := bootstrap.NewProgressBar()
-	body.AddElement(progressBar.Element)
-
-	// makes the body stop responding to user events
-	body.Disable()
-
-	// clean up - remove the added elements
-	defer func() {
-		sender.SetText("Start")
-		body.RemoveElement(text)
-		body.RemoveElement(progressBar.Element)
-		body.Enable()
-	}()
-
-	// render the progress bar
-	for i := 0; i <= 123; i++ {
-		progressBar.SetValue(i, 123)
-		text.SetText(fmt.Sprintf("Working %v", i))
-		time.Sleep(time.Millisecond * 20)
-		// this will cause the body to be refreshed
-		body.Render()
-	}
-
 }
