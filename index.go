@@ -203,18 +203,37 @@ func buildPage() error {
 	if err != nil {
 		return err
 	}
-	contract2 := bootstrap.NewElement("div", "contractContainer")
-	_, err = contract2.AddHTML(utils.Contract, nil)
-	if err != nil {
-		return err
-	}
+	contractLink1 := bootstrap.NewLinkButton("Open in new window")
+	contractLink1.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
+		saveHTML("Contract", "contract1.html", utils.Contract)
+	})
+	contractLink1.SetAttribute("href", "contract1.html")
+	contractLink1.SetAttribute("target", "_blank")
+	contractLinkDiv1 := bootstrap.NewElement("div", "contractLink", contractLink1)
+
 	if twoContracts {
+		contract2 := bootstrap.NewElement("div", "contractContainer")
+		_, err = contract2.AddHTML(utils.Contract, nil)
+		if err != nil {
+			return err
+		}
+		contractLink2 := bootstrap.NewLinkButton("Open in new window")
+		contractLink2.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
+			saveHTML("Contract", "contract2.html", utils.Contract)
+		})
+		contractLink2.SetAttribute("href", "contract2.html")
+		contractLink2.SetAttribute("target", "_blank")
+		contractLinkDiv2 := bootstrap.NewElement("div", "contractLink", contractLink2)
+
 		contract.AddElement(contract1)
+		contract.AddElement(contractLinkDiv1)
 		contract.AddElement(agreeBox1)
 		contract.AddElement(contract2)
+		contract.AddElement(contractLinkDiv2)
 		contract.AddElement(agreeBox2)
 	} else {
 		contract.AddElement(contract1)
+		contract.AddElement(contractLinkDiv1)
 		contract.AddElement(agreeBox1)
 	}
 
