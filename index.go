@@ -11,8 +11,9 @@ import (
 
 var body *gowd.Element
 
-const blurbText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus malesuada eleifend ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam pretium tempor massa, a volutpat orci mattis non. Integer tincidunt tincidunt ante sed cursus. In lacinia pulvinar tempor. Nullam id luctus nibh, vitae iaculis ante. Integer vel sem at augue viverra suscipit vel nec orci. Sed sed ultrices quam. Vestibulum hendrerit tellus justo, id tempus enim fringilla quis. Vivamus nunc ante, tincidunt et tellus eget, varius lobortis tortor. Maecenas in porta erat. Nam in dolor turpis. Aliquam a tristique arcu, vitae pulvinar tellus. Sed nec imperdiet mi, vel maximus est. Nunc aliquet eros arcu, quis faucibus nibh feugiat a. Fusce id orci nunc.\n\n"
+const blurbText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus malesuada eleifend ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam pretium tempor massa, a volutpat orci mattis non. Integer tincidunt tincidunt ante sed cursus. In lacinia pulvinar tempor. Nullam id luctus nibh, vitae iaculis ante. Integer vel sem at augue viverra suscipit vel nec orci. Sed sed ultrices quam."
 const serverAddress = "http://localhost:11420"
+const twoContracts = true
 
 type Inputs struct {
 	keyPath         string
@@ -21,7 +22,7 @@ type Inputs struct {
 	validatorWallet string
 	serverCert      string
 	serverCertPath  string
-	agree           bool
+	agree1, agree2  bool
 }
 
 func buildPage() error {
@@ -33,16 +34,25 @@ func buildPage() error {
 	// add some elements using the object model
 
 	// keyPathInput := bootstrap.NewFileButton(bootstrap.ButtonDefault, "keyPath", false)
-	keyPathInput := NewFileButton("Server Key (.key)", &inputs.keyPath)
-	idfPathInput := NewFileButton("IDF (.json)", &inputs.idfPath)
+	keyPathInput := NewFileButton("BetaNet Server Key (.key)", &inputs.keyPath)
+	idfPathInput := NewFileButton("BetaNet Server IDF (.json)", &inputs.idfPath)
 	nominatorWalletInput := bootstrap.NewFormInput("text", "Nominator Wallet Address")
 	validatorWalletInput := bootstrap.NewFormInput("text", "Validator Wallet Address")
 	serverCertPathInput := NewFileButton("BetaNet Server Certificate (.crt)", &inputs.serverCertPath)
 
-	agreeInput := bootstrap.NewCheckBox("I agree to the contract above.", false)
-	agreeHelpText := bootstrap.NewElement("p", "help-block")
-	agreeHelpText.Hidden = true
-	agreeBox := bootstrap.NewElement("div", "form-group", agreeInput.Element, agreeHelpText)
+	agreeInput1 := bootstrap.NewCheckBox("I agree to the contract above.", false)
+	agreeHelpText1 := bootstrap.NewElement("p", "help-block")
+	agreeHelpText1.Hidden = true
+	agreeInput1.AddElement(gowd.NewElement("br"))
+	agreeInput1.AddElement(agreeHelpText1)
+	agreeBox1 := bootstrap.NewElement("div", "form-group", agreeInput1.Element)
+
+	agreeInput2 := bootstrap.NewCheckBox("I agree to the contract above.", false)
+	agreeHelpText2 := bootstrap.NewElement("p", "help-block")
+	agreeHelpText2.Hidden = true
+	agreeInput2.AddElement(gowd.NewElement("br"))
+	agreeInput2.AddElement(agreeHelpText2)
+	agreeBox2 := bootstrap.NewElement("div", "form-group", agreeInput2.Element)
 
 	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
 	errBox := bootstrap.NewElement("span", "errorBox")
@@ -60,9 +70,13 @@ func buildPage() error {
 	submit.OnEvent(gowd.OnClick, func(_ *gowd.Element, event *gowd.EventElement) {
 		submit.Disable()
 		body.Disable()
+		spinner.Hidden = false
+		formErrors.Hidden = true
+		errBox.Hidden = true
 		defer func() {
 			body.Enable()
 			submit.Enable()
+			spinner.Hidden = true
 		}()
 		var errs int
 		if len(inputs.keyPath) == 0 {
@@ -123,21 +137,27 @@ func buildPage() error {
 				inputs.serverCert = string(data)
 			}
 		}
-		inputs.agree = agreeInput.Checked()
-		if inputs.agree == false {
-			agreeHelpText.SetText("Required.")
-			agreeHelpText.Hidden = false
+		inputs.agree1 = agreeInput1.Checked()
+		if inputs.agree1 == false {
+			agreeHelpText1.SetText("Required.")
+			agreeHelpText1.Hidden = false
 			errs++
 		} else {
-			agreeHelpText.Hidden = true
+			agreeHelpText1.Hidden = true
+		}
+		if twoContracts {
+			inputs.agree2 = agreeInput2.Checked()
+			if inputs.agree2 == false {
+				agreeHelpText2.SetText("Required.")
+				agreeHelpText2.Hidden = false
+				errs++
+			} else {
+				agreeHelpText2.Hidden = true
+			}
 		}
 		jww.INFO.Printf("Inputs set: %+v", inputs)
 
-		if errs >= 0 {
-			spinner.Hidden = false
-			formErrors.Hidden = true
-			errBox.Hidden = true
-
+		if errs == 0 {
 			if err := body.Render(); err != nil {
 				jww.ERROR.Print(err)
 			}
@@ -170,11 +190,32 @@ func buildPage() error {
 		}
 	})
 
-	contractText := bootstrap.NewElement("p", "contractText", gowd.NewText("Read through the entire contract below and accept the terms."))
-	contract := bootstrap.NewElement("div", "contractContainer")
-	_, err := contract.AddHTML(utils.Contract, nil)
+	contractText := bootstrap.NewElement("p", "contractText")
+	if twoContracts {
+		contractText.SetText("Read through both contracts below and accept the terms both.")
+	} else {
+		contractText.SetText("Read through the entire contract below and accept the terms.")
+	}
+
+	contract := bootstrap.NewElement("div", "contractBox", contractText)
+	contract1 := bootstrap.NewElement("div", "contractContainer")
+	_, err := contract1.AddHTML(utils.Contract, nil)
 	if err != nil {
 		return err
+	}
+	contract2 := bootstrap.NewElement("div", "contractContainer")
+	_, err = contract2.AddHTML(utils.Contract, nil)
+	if err != nil {
+		return err
+	}
+	if twoContracts {
+		contract.AddElement(contract1)
+		contract.AddElement(agreeBox1)
+		contract.AddElement(contract2)
+		contract.AddElement(agreeBox2)
+	} else {
+		contract.AddElement(contract1)
+		contract.AddElement(agreeBox1)
 	}
 
 	form := bootstrap.NewFormGroup(
@@ -184,9 +225,7 @@ func buildPage() error {
 		idfPathInput.Element,
 		nominatorWalletInput.Element,
 		validatorWalletInput.Element,
-		contractText,
 		contract,
-		agreeBox,
 		submitBox,
 	)
 
