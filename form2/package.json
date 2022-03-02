@@ -1,0 +1,16 @@
+{
+	"name": "xx-mainnet-commitments",
+	"main": "index.html",
+	"single-instance": true,
+	"window": {
+		"position": "center",
+		"width": 995,
+		"height": 750,
+		"frame": true,
+		"icon": "img/favicon-32x32.png"
+	},
+	"webkit": {
+		"plugin": true
+	},
+	"version": "1.0.0"
+}

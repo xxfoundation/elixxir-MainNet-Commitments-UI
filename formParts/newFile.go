@@ -1,11 +1,11 @@
-package main
+package formParts
 
 import (
 	jww "github.com/spf13/jwalterweatherman"
 	utils2 "gitlab.com/xx_network/primitives/utils"
 )
 
-func saveHTML(title, name, content string) {
+func SaveHTML(title, name, content string) {
 	head := `<!DOCTYPE html>
 <html lang="en">
 

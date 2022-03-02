@@ -1,4 +1,4 @@
-package main
+package formParts
 
 import (
 	"github.com/dtylman/gowd"
