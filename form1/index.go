@@ -14,7 +14,6 @@ var body *gowd.Element
 
 const blurbText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus malesuada eleifend ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam pretium tempor massa, a volutpat orci mattis non. Integer tincidunt tincidunt ante sed cursus. In lacinia pulvinar tempor. Nullam id luctus nibh, vitae iaculis ante. Integer vel sem at augue viverra suscipit vel nec orci. Sed sed ultrices quam."
 const serverAddress = "http://localhost:11420"
-const twoContracts = true
 
 type Inputs struct {
 	keyPath         string
@@ -155,7 +154,7 @@ func buildPage() error {
 				formErrors.Hidden = false
 			} else {
 				divWell.RemoveElements()
-				success := bootstrap.NewElement("span", "success", gowd.NewText("MainNet Commitments Successful."))
+				success := bootstrap.NewElement("span", "success", gowd.NewText("November BetaNet Compensation Successful."))
 				divWell.AddElement(success)
 			}
 		} else {
@@ -165,11 +164,7 @@ func buildPage() error {
 	})
 
 	contractText := bootstrap.NewElement("p", "contractText")
-	if twoContracts {
-		contractText.SetText("Read through both contracts below and accept the terms both.")
-	} else {
-		contractText.SetText("Read through the entire contract below and accept the terms.")
-	}
+	contractText.SetText("Read through the entire contract below and accept the terms.")
 
 	contract := bootstrap.NewElement("div", "contractBox", contractText)
 	contract1 := bootstrap.NewElement("div", "contractContainer")
@@ -202,7 +197,7 @@ func buildPage() error {
 	form.SetAttribute("style", "margin-top:35px")
 
 	h1 := bootstrap.NewElement("h1", "")
-	h1.SetText("xx network MainNet Commitments")
+	h1.SetText("November BetaNet Compensation")
 	logo := bootstrap.NewElement("img", "logo")
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)

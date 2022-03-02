@@ -1,7 +1,7 @@
 # MainNet Commitments UI
 
 Runs the UI for MainNet commitments UI. This repo contains two forms:
-1. Form 1:
+1. Form 1: November BetaNet Compensation
 2. Form 2:
 
 ### Setup:

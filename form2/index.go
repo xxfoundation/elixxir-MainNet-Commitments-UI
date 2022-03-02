@@ -14,7 +14,6 @@ var body *gowd.Element
 
 const blurbText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus malesuada eleifend ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam pretium tempor massa, a volutpat orci mattis non. Integer tincidunt tincidunt ante sed cursus. In lacinia pulvinar tempor. Nullam id luctus nibh, vitae iaculis ante. Integer vel sem at augue viverra suscipit vel nec orci. Sed sed ultrices quam."
 const serverAddress = "http://localhost:11420"
-const twoContracts = true
 
 type Inputs struct {
 	keyPath         string
@@ -175,11 +174,7 @@ func buildPage() error {
 	})
 
 	contractText := bootstrap.NewElement("p", "contractText")
-	if twoContracts {
-		contractText.SetText("Read through both contracts below and accept the terms both.")
-	} else {
-		contractText.SetText("Read through the entire contract below and accept the terms.")
-	}
+	contractText.SetText("Read through the entire contract below and accept the terms.")
 
 	contract := bootstrap.NewElement("div", "contractBox", contractText)
 	contract1 := bootstrap.NewElement("div", "contractContainer")
