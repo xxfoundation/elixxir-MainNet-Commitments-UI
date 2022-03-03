@@ -176,8 +176,8 @@ func buildPage() error {
 	contractLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
 		gowd.ExecJSNow(`
 let prtContent = document.getElementById("` + contract1.GetID() + `");
-console.log(prtContent.innerHTML);
 let WinPrint = window.open('', '', '');
+WinPrint.document.write('<title>TERMS AND CONDITIONS FOR MAINNET SUPPORT REIMBURSEMENT</title>');
 WinPrint.document.write(prtContent.innerHTML);
 WinPrint.document.close();
 WinPrint.focus();`)
@@ -187,8 +187,8 @@ WinPrint.focus();`)
 	contractPrintLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
 		gowd.ExecJSNow(`
 let prtContent = document.getElementById("` + contract1.GetID() + `");
-console.log(prtContent.innerHTML);
 let WinPrint = window.open('', '', '');
+WinPrint.document.write('<title>TERMS AND CONDITIONS FOR MAINNET SUPPORT REIMBURSEMENT</title>');
 WinPrint.document.write(prtContent.innerHTML);
 WinPrint.document.close();
 WinPrint.focus();
