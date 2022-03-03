@@ -12,7 +12,7 @@ build:
 	go mod tidy
 
 update_release:
-	GOFLAGS="" go get git.xx.network/elixxir/mainnet-commitments@bee/upgrade
+	GOFLAGS="" go get git.xx.network/elixxir/mainnet-commitments@release
 
 update_master:
 	GOFLAGS="" go get git.xx.network/elixxir/mainnet-commitments@master
