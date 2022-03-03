@@ -18,7 +18,7 @@ const serverAddress = "http://localhost:11420"
 type Inputs struct {
 	keyPath         string
 	idfPath         string
-	nominatorWallet string
+	paymentWallet   string
 	validatorWallet string
 	serverCert      string
 	serverCertPath  string
@@ -36,7 +36,7 @@ func buildPage() error {
 	// keyPathInput := bootstrap.NewFileButton(bootstrap.ButtonDefault, "keyPath", false)
 	keyPathInput := formParts.NewFileButton("BetaNet Server Key (.key)", &inputs.keyPath)
 	idfPathInput := formParts.NewFileButton("BetaNet Server IDF (.json)", &inputs.idfPath)
-	nominatorWalletInput := bootstrap.NewFormInput("text", "Wallet to receive payment")
+	paymentWalletInput := bootstrap.NewFormInput("text", "Wallet to receive payment")
 	serverCertPathInput := formParts.NewFileButton("BetaNet Server Certificate (.crt)", &inputs.serverCertPath)
 
 	agreeInput := bootstrap.NewCheckBox("I agree to the contract above.", false)
@@ -96,13 +96,13 @@ func buildPage() error {
 				errs++
 			}
 		}
-		inputs.nominatorWallet = nominatorWalletInput.GetValue()
-		if len(inputs.nominatorWallet) == 0 {
-			nominatorWalletInput.SetHelpText("Required.")
+		inputs.paymentWallet = paymentWalletInput.GetValue()
+		if len(inputs.paymentWallet) == 0 {
+			paymentWalletInput.SetHelpText("Required.")
 			errs++
 		} else {
-			if len(nominatorWalletInput.Kids) > 2 {
-				nominatorWalletInput.Kids[2].Hidden = true
+			if len(paymentWalletInput.Kids) > 2 {
+				paymentWalletInput.Kids[2].Hidden = true
 			}
 		}
 		if len(inputs.serverCertPath) == 0 {
@@ -138,8 +138,7 @@ func buildPage() error {
 			err := client.SignAndTransmit(
 				inputs.keyPath,
 				inputs.idfPath,
-				inputs.nominatorWallet,
-				inputs.validatorWallet,
+				inputs.paymentWallet,
 				serverAddress,
 				inputs.serverCert,
 				utils.NovemberContract)
@@ -191,7 +190,7 @@ func buildPage() error {
 		serverCertPathInput.Element,
 		keyPathInput.Element,
 		idfPathInput.Element,
-		nominatorWalletInput.Element,
+		paymentWalletInput.Element,
 		contract,
 		submitBox,
 	)

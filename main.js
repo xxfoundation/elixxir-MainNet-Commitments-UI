@@ -1,8 +1,8 @@
 let os = require('os');
 let child;
 let fails = 0;
-let goBinary = "./mainNetCommitments";
-let args = ["-v=2", "-l=mainnet-commitments-ui.log"]
+let goBinary = "./mainnet-commitments-ui";
+let args = []
 
 function setPage(html) {
     const container = document.getElementById("app");
