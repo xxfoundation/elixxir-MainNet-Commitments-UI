@@ -183,14 +183,30 @@ func buildPage() error {
 		return err
 	}
 	contractLink := bootstrap.NewLinkButton("Open in new window")
+	contractLink.RemoveAttribute("href")
 	contractLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		formParts.SaveHTML(
-			"PARTICIPANT TERMS AND CONDITIONS FOR MAINNET TRANSITION PROGRAM",
-			"contract.html", utils.Contract)
+		gowd.ExecJSNow(`
+let prtContent = document.getElementById("` + contract1.GetID() + `");
+console.log(prtContent.innerHTML);
+let WinPrint = window.open('', '', '');
+WinPrint.document.write(prtContent.innerHTML);
+WinPrint.document.close();
+WinPrint.focus();`)
 	})
-	contractLink.SetAttribute("href", "contract.html")
-	contractLink.SetAttribute("target", "_blank")
-	contractLinkDiv := bootstrap.NewElement("div", "contractLink", contractLink)
+	contractPrintLink := bootstrap.NewLinkButton("Print")
+	contractPrintLink.RemoveAttribute("href")
+	contractPrintLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
+		gowd.ExecJSNow(`
+let prtContent = document.getElementById("` + contract1.GetID() + `");
+console.log(prtContent.innerHTML);
+let WinPrint = window.open('', '', '');
+WinPrint.document.write(prtContent.innerHTML);
+WinPrint.document.close();
+WinPrint.focus();
+WinPrint.print();
+WinPrint.close();`)
+	})
+	contractLinkDiv := bootstrap.NewElement("div", "contractLink", contractLink, contractPrintLink)
 
 	contract.AddElement(contract1)
 	contract.AddElement(contractLinkDiv)

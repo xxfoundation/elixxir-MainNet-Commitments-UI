@@ -3,6 +3,12 @@ body {
     background: #08CDD7;
 }
 
+.contractLink a {
+    cursor: pointer;
+    padding:0 5px;
+    font-size: 95%;
+}
+
 .logo {
     float: right;
     width: 35px;
