@@ -184,9 +184,11 @@ func buildPage() error {
 	}
 	contractLink := bootstrap.NewLinkButton("Open in new window")
 	contractLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		formParts.SaveHTML("Contract", "contract1.html", utils.Contract)
+		formParts.SaveHTML(
+			"PARTICIPANT TERMS AND CONDITIONS FOR MAINNET TRANSITION PROGRAM",
+			"contract.html", utils.Contract)
 	})
-	contractLink.SetAttribute("href", "contract1.html")
+	contractLink.SetAttribute("href", "contract.html")
 	contractLink.SetAttribute("target", "_blank")
 	contractLinkDiv := bootstrap.NewElement("div", "contractLink", contractLink)
 

@@ -142,7 +142,7 @@ func buildPage() error {
 				inputs.validatorWallet,
 				serverAddress,
 				inputs.serverCert,
-				utils.Contract)
+				utils.NovemberContract)
 
 			spinner.Hidden = true
 
@@ -168,15 +168,17 @@ func buildPage() error {
 
 	contract := bootstrap.NewElement("div", "contractBox", contractText)
 	contract1 := bootstrap.NewElement("div", "contractContainer")
-	_, err := contract1.AddHTML(utils.Contract, nil)
+	_, err := contract1.AddHTML(utils.NovemberContract, nil)
 	if err != nil {
 		return err
 	}
 	contractLink := bootstrap.NewLinkButton("Open in new window")
 	contractLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		formParts.SaveHTML("Contract", "contract1.html", utils.Contract)
+		formParts.SaveHTML(
+			"TERMS AND CONDITIONS FOR MAINNET SUPPORT REIMBURSEMENT",
+			"contract.html", utils.NovemberContract)
 	})
-	contractLink.SetAttribute("href", "contract1.html")
+	contractLink.SetAttribute("href", "contract.html")
 	contractLink.SetAttribute("target", "_blank")
 	contractLinkDiv := bootstrap.NewElement("div", "contractLink", contractLink)
 
