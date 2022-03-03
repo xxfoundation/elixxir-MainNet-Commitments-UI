@@ -2,7 +2,7 @@
 
 Runs the UI for MainNet commitments UI. This repo contains two forms:
 1. Form 1: November BetaNet Compensation
-2. Form 2: MainNet commitments
+2. Form 2: MainNet Commitments
 
 ### Setup:
 
@@ -14,7 +14,7 @@ The SDK version includes the developer console.
 
 1. Change directories to the desired form.
 ```
-cd form1
+cd mainNetCommitments
 ```
 2. Compile project.
 ```

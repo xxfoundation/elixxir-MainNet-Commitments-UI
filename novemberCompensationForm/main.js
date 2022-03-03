@@ -1,7 +1,7 @@
 let os = require('os');
 let child;
 let fails = 0;
-let goBinary = "./form2";
+let goBinary = "./novemberCompensationForm";
 let args = ["-v=2", "-l=mainnet-commitments-ui.log"]
 
 function setPage(html) {
