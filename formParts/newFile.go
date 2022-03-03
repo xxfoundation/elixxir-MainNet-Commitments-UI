@@ -1,20 +1,17 @@
-package main
+package formParts
 
 import (
 	jww "github.com/spf13/jwalterweatherman"
 	utils2 "gitlab.com/xx_network/primitives/utils"
 )
 
-func saveHTML(title, name, content string) {
+func SaveHTML(title, name, content string) {
 	head := `<!DOCTYPE html>
 <html lang="en">
 
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
-	<link rel="stylesheet" type="text/css" href="css/style.css"/>
-	<style>body{padding:2em; background:#fff;}</style>
 	<title>` + title + `</title>
 </head><body>`
 

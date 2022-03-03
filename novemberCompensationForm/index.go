@@ -1,6 +1,7 @@
 package main
 
 import (
+	"git.xx.network/elixxir/mainnet-commitments-ui/formParts"
 	"git.xx.network/elixxir/mainnet-commitments/client"
 	"git.xx.network/elixxir/mainnet-commitments/utils"
 	"github.com/dtylman/gowd"
@@ -13,7 +14,6 @@ var body *gowd.Element
 
 const blurbText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus malesuada eleifend ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam pretium tempor massa, a volutpat orci mattis non. Integer tincidunt tincidunt ante sed cursus. In lacinia pulvinar tempor. Nullam id luctus nibh, vitae iaculis ante. Integer vel sem at augue viverra suscipit vel nec orci. Sed sed ultrices quam."
 const serverAddress = "http://localhost:11420"
-const twoContracts = true
 
 type Inputs struct {
 	keyPath         string
@@ -22,7 +22,7 @@ type Inputs struct {
 	validatorWallet string
 	serverCert      string
 	serverCertPath  string
-	agree1, agree2  bool
+	agree           bool
 }
 
 func buildPage() error {
@@ -34,25 +34,17 @@ func buildPage() error {
 	// add some elements using the object model
 
 	// keyPathInput := bootstrap.NewFileButton(bootstrap.ButtonDefault, "keyPath", false)
-	keyPathInput := NewFileButton("BetaNet Server Key (.key)", &inputs.keyPath)
-	idfPathInput := NewFileButton("BetaNet Server IDF (.json)", &inputs.idfPath)
-	nominatorWalletInput := bootstrap.NewFormInput("text", "Nominator Wallet Address")
-	validatorWalletInput := bootstrap.NewFormInput("text", "Validator Wallet Address")
-	serverCertPathInput := NewFileButton("BetaNet Server Certificate (.crt)", &inputs.serverCertPath)
+	keyPathInput := formParts.NewFileButton("BetaNet Server Key (.key)", &inputs.keyPath)
+	idfPathInput := formParts.NewFileButton("BetaNet Server IDF (.json)", &inputs.idfPath)
+	nominatorWalletInput := bootstrap.NewFormInput("text", "Wallet to receive payment")
+	serverCertPathInput := formParts.NewFileButton("BetaNet Server Certificate (.crt)", &inputs.serverCertPath)
 
-	agreeInput1 := bootstrap.NewCheckBox("I agree to the contract above.", false)
-	agreeHelpText1 := bootstrap.NewElement("p", "help-block")
-	agreeHelpText1.Hidden = true
-	agreeInput1.AddElement(gowd.NewElement("br"))
-	agreeInput1.AddElement(agreeHelpText1)
-	agreeBox1 := bootstrap.NewElement("div", "form-group", agreeInput1.Element)
-
-	agreeInput2 := bootstrap.NewCheckBox("I agree to the contract above.", false)
-	agreeHelpText2 := bootstrap.NewElement("p", "help-block")
-	agreeHelpText2.Hidden = true
-	agreeInput2.AddElement(gowd.NewElement("br"))
-	agreeInput2.AddElement(agreeHelpText2)
-	agreeBox2 := bootstrap.NewElement("div", "form-group", agreeInput2.Element)
+	agreeInput := bootstrap.NewCheckBox("I agree to the contract above.", false)
+	agreeHelpText := bootstrap.NewElement("p", "help-block")
+	agreeHelpText.Hidden = true
+	agreeInput.AddElement(gowd.NewElement("br"))
+	agreeInput.AddElement(agreeHelpText)
+	agreeBox1 := bootstrap.NewElement("div", "form-group", agreeInput.Element)
 
 	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
 	errBox := bootstrap.NewElement("span", "errorBox")
@@ -113,15 +105,6 @@ func buildPage() error {
 				nominatorWalletInput.Kids[2].Hidden = true
 			}
 		}
-		inputs.validatorWallet = validatorWalletInput.GetValue()
-		if len(inputs.validatorWallet) == 0 {
-			validatorWalletInput.SetHelpText("Required.")
-			errs++
-		} else {
-			if len(validatorWalletInput.Kids) > 2 {
-				validatorWalletInput.Kids[2].Hidden = true
-			}
-		}
 		if len(inputs.serverCertPath) == 0 {
 			serverCertPathInput.SetHelpText("Required.")
 			errs++
@@ -137,23 +120,13 @@ func buildPage() error {
 				inputs.serverCert = string(data)
 			}
 		}
-		inputs.agree1 = agreeInput1.Checked()
-		if inputs.agree1 == false {
-			agreeHelpText1.SetText("Required.")
-			agreeHelpText1.Hidden = false
+		inputs.agree = agreeInput.Checked()
+		if inputs.agree == false {
+			agreeHelpText.SetText("Required.")
+			agreeHelpText.Hidden = false
 			errs++
 		} else {
-			agreeHelpText1.Hidden = true
-		}
-		if twoContracts {
-			inputs.agree2 = agreeInput2.Checked()
-			if inputs.agree2 == false {
-				agreeHelpText2.SetText("Required.")
-				agreeHelpText2.Hidden = false
-				errs++
-			} else {
-				agreeHelpText2.Hidden = true
-			}
+			agreeHelpText.Hidden = true
 		}
 		jww.INFO.Printf("Inputs set: %+v", inputs)
 
@@ -169,7 +142,7 @@ func buildPage() error {
 				inputs.validatorWallet,
 				serverAddress,
 				inputs.serverCert,
-				utils.Contract)
+				utils.NovemberContract)
 
 			spinner.Hidden = true
 
@@ -181,7 +154,7 @@ func buildPage() error {
 				formErrors.Hidden = false
 			} else {
 				divWell.RemoveElements()
-				success := bootstrap.NewElement("span", "success", gowd.NewText("MainNet Commitments Successful."))
+				success := bootstrap.NewElement("span", "success", gowd.NewText("November BetaNet Compensation Successful."))
 				divWell.AddElement(success)
 			}
 		} else {
@@ -191,51 +164,27 @@ func buildPage() error {
 	})
 
 	contractText := bootstrap.NewElement("p", "contractText")
-	if twoContracts {
-		contractText.SetText("Read through both contracts below and accept the terms both.")
-	} else {
-		contractText.SetText("Read through the entire contract below and accept the terms.")
-	}
+	contractText.SetText("Read through the entire contract below and accept the terms.")
 
 	contract := bootstrap.NewElement("div", "contractBox", contractText)
 	contract1 := bootstrap.NewElement("div", "contractContainer")
-	_, err := contract1.AddHTML(utils.Contract, nil)
+	_, err := contract1.AddHTML(utils.NovemberContract, nil)
 	if err != nil {
 		return err
 	}
-	contractLink1 := bootstrap.NewLinkButton("Open in new window")
-	contractLink1.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		saveHTML("Contract", "contract1.html", utils.Contract)
+	contractLink := bootstrap.NewLinkButton("Open in new window")
+	contractLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
+		formParts.SaveHTML(
+			"TERMS AND CONDITIONS FOR MAINNET SUPPORT REIMBURSEMENT",
+			"contract.html", utils.NovemberContract)
 	})
-	contractLink1.SetAttribute("href", "contract1.html")
-	contractLink1.SetAttribute("target", "_blank")
-	contractLinkDiv1 := bootstrap.NewElement("div", "contractLink", contractLink1)
+	contractLink.SetAttribute("href", "contract.html")
+	contractLink.SetAttribute("target", "_blank")
+	contractLinkDiv := bootstrap.NewElement("div", "contractLink", contractLink)
 
-	if twoContracts {
-		contract2 := bootstrap.NewElement("div", "contractContainer")
-		_, err = contract2.AddHTML(utils.Contract, nil)
-		if err != nil {
-			return err
-		}
-		contractLink2 := bootstrap.NewLinkButton("Open in new window")
-		contractLink2.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-			saveHTML("Contract", "contract2.html", utils.Contract)
-		})
-		contractLink2.SetAttribute("href", "contract2.html")
-		contractLink2.SetAttribute("target", "_blank")
-		contractLinkDiv2 := bootstrap.NewElement("div", "contractLink", contractLink2)
-
-		contract.AddElement(contract1)
-		contract.AddElement(contractLinkDiv1)
-		contract.AddElement(agreeBox1)
-		contract.AddElement(contract2)
-		contract.AddElement(contractLinkDiv2)
-		contract.AddElement(agreeBox2)
-	} else {
-		contract.AddElement(contract1)
-		contract.AddElement(contractLinkDiv1)
-		contract.AddElement(agreeBox1)
-	}
+	contract.AddElement(contract1)
+	contract.AddElement(contractLinkDiv)
+	contract.AddElement(agreeBox1)
 
 	form := bootstrap.NewFormGroup(
 		formErrors,
@@ -243,7 +192,6 @@ func buildPage() error {
 		keyPathInput.Element,
 		idfPathInput.Element,
 		nominatorWalletInput.Element,
-		validatorWalletInput.Element,
 		contract,
 		submitBox,
 	)
@@ -251,7 +199,7 @@ func buildPage() error {
 	form.SetAttribute("style", "margin-top:35px")
 
 	h1 := bootstrap.NewElement("h1", "")
-	h1.SetText("xx network MainNet Commitments")
+	h1.SetText("November BetaNet Compensation")
 	logo := bootstrap.NewElement("img", "logo")
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)
