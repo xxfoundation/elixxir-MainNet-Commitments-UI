@@ -7,6 +7,7 @@ require (
 	github.com/dtylman/gowd v0.0.0-20190619113956-15e38debca22
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/jwalterweatherman v1.1.0
+	github.com/xx-labs/sleeve v0.1.1-0.20211013215902-d22a28ed32ff
 	gitlab.com/xx_network/primitives v0.0.4-0.20220222211843-901fa4a2d72b
 )
 
@@ -58,7 +59,6 @@ require (
 	github.com/tyler-smith/go-bip39 v1.1.0 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
 	github.com/vedhavyas/go-subkey v1.0.2 // indirect
-	github.com/xx-labs/sleeve v0.1.1-0.20211013215902-d22a28ed32ff // indirect
 	github.com/zeebo/blake3 v0.1.1 // indirect
 	gitlab.com/xx_network/crypto v0.0.5-0.20210914231859-c309efac46c4 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect

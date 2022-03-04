@@ -7,6 +7,7 @@ import (
 	"github.com/dtylman/gowd"
 	"github.com/dtylman/gowd/bootstrap"
 	jww "github.com/spf13/jwalterweatherman"
+	"github.com/xx-labs/sleeve/wallet"
 	utils2 "gitlab.com/xx_network/primitives/utils"
 	"strconv"
 )
@@ -102,8 +103,16 @@ func buildPage() error {
 		if len(inputs.nominatorWallet) == 0 {
 			nominatorWalletInput.SetHelpText("Required.")
 			errs++
+		} else if len(inputs.nominatorWallet) < 48 {
+			nominatorWalletInput.SetHelpText("Invalid wallet address.")
+			errs++
 		} else {
-			if len(nominatorWalletInput.Kids) > 2 {
+			ok, err := wallet.ValidateXXNetworkAddress(inputs.nominatorWallet)
+			if !ok || err != nil {
+				nominatorWalletInput.SetHelpText("Invalid wallet address.")
+				jww.ERROR.Printf("Invalid nominator wallet address: %+v", err)
+				errs++
+			} else if len(nominatorWalletInput.Kids) > 2 {
 				nominatorWalletInput.Kids[2].Hidden = true
 			}
 		}
@@ -111,8 +120,16 @@ func buildPage() error {
 		if len(inputs.validatorWallet) == 0 {
 			validatorWalletInput.SetHelpText("Required.")
 			errs++
+		} else if len(inputs.validatorWallet) < 48 {
+			validatorWalletInput.SetHelpText("Invalid wallet address.")
+			errs++
 		} else {
-			if len(validatorWalletInput.Kids) > 2 {
+			ok, err := wallet.ValidateXXNetworkAddress(inputs.validatorWallet)
+			if !ok || err != nil {
+				validatorWalletInput.SetHelpText("Invalid wallet address.")
+				jww.ERROR.Printf("Invalid validator wallet address: %+v", err)
+				errs++
+			} else if len(validatorWalletInput.Kids) > 2 {
 				validatorWalletInput.Kids[2].Hidden = true
 			}
 		}
