@@ -7,7 +7,9 @@ import (
 	"github.com/dtylman/gowd"
 	"github.com/dtylman/gowd/bootstrap"
 	jww "github.com/spf13/jwalterweatherman"
+	"github.com/xx-labs/sleeve/wallet"
 	utils2 "gitlab.com/xx_network/primitives/utils"
+	"strconv"
 )
 
 var body *gowd.Element
@@ -100,8 +102,16 @@ func buildPage() error {
 		if len(inputs.paymentWallet) == 0 {
 			paymentWalletInput.SetHelpText("Required.")
 			errs++
+		} else if len(inputs.paymentWallet) < 48 {
+			paymentWalletInput.SetHelpText("Invalid wallet address.")
+			errs++
 		} else {
-			if len(paymentWalletInput.Kids) > 2 {
+			ok, err := wallet.ValidateXXNetworkAddress(inputs.paymentWallet)
+			if !ok || err != nil {
+				paymentWalletInput.SetHelpText("Invalid wallet address.")
+				jww.ERROR.Printf("Invalid payment wallet address: %+v", err)
+				errs++
+			} else if len(paymentWalletInput.Kids) > 2 {
 				paymentWalletInput.Kids[2].Hidden = true
 			}
 		}
@@ -167,6 +177,8 @@ func buildPage() error {
 
 	contract := bootstrap.NewElement("div", "contractBox", contractText)
 	contract1 := bootstrap.NewElement("div", "contractContainer")
+	contractFontSize := 100
+	contract1.SetAttribute("style", "font-size:"+strconv.Itoa(contractFontSize)+"%;")
 	_, err := contract1.AddHTML(utils.NovemberContract, nil)
 	if err != nil {
 		return err
@@ -195,7 +207,23 @@ WinPrint.focus();
 WinPrint.print();
 WinPrint.close();`)
 	})
-	contractLinkDiv := bootstrap.NewElement("div", "contractLink", contractLink, contractPrintLink)
+
+	incFontSizeLink := bootstrap.NewLinkButton("+")
+	incFontSizeLink.RemoveAttribute("href")
+	incFontSizeLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
+		contractFontSize += 5
+		contract1.SetAttribute("style", "font-size:"+strconv.Itoa(contractFontSize)+"%;")
+	})
+	decFontSizeLink := bootstrap.NewLinkButton("-")
+	decFontSizeLink.RemoveAttribute("href")
+	decFontSizeLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
+		contractFontSize -= 5
+		contract1.SetAttribute("style", "font-size:"+strconv.Itoa(contractFontSize)+"%;")
+	})
+	fontSizeSpan := bootstrap.NewElement("span", "", gowd.NewText("Font size: "), incFontSizeLink, decFontSizeLink)
+	fontSizeSpan.SetAttribute("style", "float:right;font-size:92%;")
+
+	contractLinkDiv := bootstrap.NewElement("div", "contractLink", contractLink, contractPrintLink, fontSizeSpan)
 
 	contract.AddElement(contract1)
 	contract.AddElement(contractLinkDiv)
