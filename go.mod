@@ -7,7 +7,7 @@ require (
 	github.com/dtylman/gowd v0.0.0-20190619113956-15e38debca22
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/jwalterweatherman v1.1.0
-	github.com/xx-labs/sleeve v0.1.1-0.20211013215902-d22a28ed32ff
+	github.com/xx-labs/sleeve v0.2.1
 	gitlab.com/xx_network/primitives v0.0.4-0.20220222211843-901fa4a2d72b
 )
 

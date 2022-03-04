@@ -15,7 +15,7 @@ import (
 var body *gowd.Element
 
 const blurbText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus malesuada eleifend ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam pretium tempor massa, a volutpat orci mattis non. Integer tincidunt tincidunt ante sed cursus. In lacinia pulvinar tempor. Nullam id luctus nibh, vitae iaculis ante. Integer vel sem at augue viverra suscipit vel nec orci. Sed sed ultrices quam."
-const serverAddress = "http://localhost:11420"
+const serverAddress = "http://3.71.253.147"
 
 type Inputs struct {
 	keyPath         string
@@ -101,9 +101,6 @@ func buildPage() error {
 		inputs.paymentWallet = paymentWalletInput.GetValue()
 		if len(inputs.paymentWallet) == 0 {
 			paymentWalletInput.SetHelpText("Required.")
-			errs++
-		} else if len(inputs.paymentWallet) < 48 {
-			paymentWalletInput.SetHelpText("Invalid wallet address.")
 			errs++
 		} else {
 			ok, err := wallet.ValidateXXNetworkAddress(inputs.paymentWallet)
