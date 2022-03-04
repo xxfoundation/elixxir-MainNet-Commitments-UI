@@ -103,9 +103,6 @@ func buildPage() error {
 		if len(inputs.nominatorWallet) == 0 {
 			nominatorWalletInput.SetHelpText("Required.")
 			errs++
-		} else if len(inputs.nominatorWallet) < 48 {
-			nominatorWalletInput.SetHelpText("Invalid wallet address.")
-			errs++
 		} else {
 			ok, err := wallet.ValidateXXNetworkAddress(inputs.nominatorWallet)
 			if !ok || err != nil {
@@ -119,9 +116,6 @@ func buildPage() error {
 		inputs.validatorWallet = validatorWalletInput.GetValue()
 		if len(inputs.validatorWallet) == 0 {
 			validatorWalletInput.SetHelpText("Required.")
-			errs++
-		} else if len(inputs.validatorWallet) < 48 {
-			validatorWalletInput.SetHelpText("Invalid wallet address.")
 			errs++
 		} else {
 			ok, err := wallet.ValidateXXNetworkAddress(inputs.validatorWallet)
