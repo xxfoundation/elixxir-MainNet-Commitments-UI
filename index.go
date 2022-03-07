@@ -14,7 +14,7 @@ import (
 
 var body *gowd.Element
 
-const blurbText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus malesuada eleifend ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam pretium tempor massa, a volutpat orci mattis non. Integer tincidunt tincidunt ante sed cursus. In lacinia pulvinar tempor. Nullam id luctus nibh, vitae iaculis ante. Integer vel sem at augue viverra suscipit vel nec orci. Sed sed ultrices quam."
+const blurbText = `This applet will allow you to sign the contract to receive 4,000xx in compensation for running your node in the first half of November 2021. For more information, please see the&nbsp;`
 const serverAddress = "http://3.71.253.147"
 
 type Inputs struct {
@@ -245,7 +245,15 @@ WinPrint.close();`)
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)
 	p := bootstrap.NewElement("p", "blurb")
-	p.SetText(blurbText)
+	p.AddHTML(blurbText, nil)
+	instructionPageLink := bootstrap.NewLinkButton("instructions page")
+	instructionPageLink.RemoveAttribute("href")
+	instructionPageLink.SetAttribute("style", "cursor:pointer;")
+	instructionPageLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
+		gowd.ExecJSNow("window.nw.Shell.openExternal('https://xx.network/november-betanet-compensation-applet-instructions/')")
+	})
+	p.AddElement(instructionPageLink)
+	p.AddElement(gowd.NewText("."))
 	divWell.AddElement(h1)
 	divWell.AddElement(p)
 	divWell.AddElement(form)
