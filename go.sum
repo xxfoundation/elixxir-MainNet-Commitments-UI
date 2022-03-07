@@ -48,8 +48,8 @@ cloud.google.com/go/storage v1.6.0/go.mod h1:N7U0C8pVQ/+NIKOBQyamJIeKQKkZ+mxpohl
 cloud.google.com/go/storage v1.8.0/go.mod h1:Wv1Oy7z6Yz3DshWRJFhqM/UCfaWIRTdp0RXyy7KQOVs=
 cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9ullr3+Kg0=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
-git.xx.network/elixxir/mainnet-commitments v0.0.0-20220303191543-a32383388a04 h1:q87kcVCumpsjNJh+gCNsTCaSMstzWU6CmoAQYkXPGkE=
-git.xx.network/elixxir/mainnet-commitments v0.0.0-20220303191543-a32383388a04/go.mod h1:eTB7pgwrQevumi/pO01Kp7qxjp1vEKcblsWsH/VohGU=
+git.xx.network/elixxir/mainnet-commitments v0.0.0-20220307232322-ad95d9cdc769 h1:o3D9iZqMZSZUXf3cpgQLgACHmWQ5c8MftQ9vmMHBWtY=
+git.xx.network/elixxir/mainnet-commitments v0.0.0-20220307232322-ad95d9cdc769/go.mod h1:eTB7pgwrQevumi/pO01Kp7qxjp1vEKcblsWsH/VohGU=
 github.com/Azure/azure-pipeline-go v0.2.1/go.mod h1:UGSo8XybXnIGZ3epmeBw7Jdz+HiUVpqIlpz/HKHylF4=
 github.com/Azure/azure-pipeline-go v0.2.2/go.mod h1:4rQ/NZncSvGqNkkOsNpOU1tgoNuIlp9AfUH5G1tvCHc=
 github.com/Azure/azure-storage-blob-go v0.7.0/go.mod h1:f9YQKtsG1nMisotuTPpO0tjNuEjKRYAcJU8/ydDI++4=
@@ -599,7 +599,6 @@ github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtX
 github.com/vedhavyas/go-subkey v1.0.2 h1:EW6U+1us4k38AtrBfFOEZTpW9FcF/cIUOxw/pHbNNQ0=
 github.com/vedhavyas/go-subkey v1.0.2/go.mod h1:T9SEs84XZxRULMZLWtIl48s9rBNE7h6GnkqTgJR8+MU=
 github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208/go.mod h1:IotVbo4F+mw0EzQ08zFqg7pK3FebNXpaMsRy2RT+Ees=
-github.com/xx-labs/sleeve v0.1.1-0.20211013215902-d22a28ed32ff h1:fknKZbwxC8Uhf68W6ASkZ/brkM+WL5HMt9NJjU5Nlgw=
 github.com/xx-labs/sleeve v0.1.1-0.20211013215902-d22a28ed32ff/go.mod h1:rk11YervrN5ybveKO0TIeDwE7oc4RenViLM8Hhru3vM=
 github.com/xx-labs/sleeve v0.2.1 h1:V9LZ8E7fZrBuNoAP63vd1QTQsmOQZYgwmLPwVZjTj8U=
 github.com/xx-labs/sleeve v0.2.1/go.mod h1:QoC87dZN74zd5roNox7usb4QH55EOKmTZz5RwHMOwzA=

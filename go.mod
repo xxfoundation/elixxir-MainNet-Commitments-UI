@@ -3,7 +3,7 @@ module git.xx.network/elixxir/mainnet-commitments-ui
 go 1.17
 
 require (
-	git.xx.network/elixxir/mainnet-commitments v0.0.0-20220303191543-a32383388a04
+	git.xx.network/elixxir/mainnet-commitments v0.0.0-20220307232322-ad95d9cdc769
 	github.com/dtylman/gowd v0.0.0-20190619113956-15e38debca22
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/jwalterweatherman v1.1.0
