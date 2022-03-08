@@ -15,7 +15,7 @@ import (
 var body *gowd.Element
 
 const blurbText = `This applet will allow you to sign the contract to receive 4,000xx in compensation for running your node in the first half of November 2021. For more information, please see the&nbsp;`
-const serverAddress = "http://3.71.253.147"
+const serverAddress = "https://3.71.253.147:11420"
 
 type Inputs struct {
 	keyPath         string
