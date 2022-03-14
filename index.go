@@ -14,8 +14,8 @@ import (
 
 var body *gowd.Element
 
-const blurbText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus malesuada eleifend ultrices. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam pretium tempor massa, a volutpat orci mattis non. Integer tincidunt tincidunt ante sed cursus. In lacinia pulvinar tempor. Nullam id luctus nibh, vitae iaculis ante. Integer vel sem at augue viverra suscipit vel nec orci. Sed sed ultrices quam."
-const serverAddress = "http://localhost:11420"
+const blurbText = `This applet will allow you to commit your wallets. For more information, please see the&nbsp;`
+const serverAddress = "https://18.185.229.39:11420"
 
 type Inputs struct {
 	keyPath         string
@@ -64,9 +64,9 @@ func buildPage() error {
 
 	shade := bootstrap.NewElement("div", "shade")
 	body.AddElement(shade)
-	confirmBoxText := bootstrap.NewElement("span", "", gowd.NewText("You did not supply a nominator wallet address. You may continue without it, but then.... Are you sure you want to continue without a nominator wallet address?"))
-	confirmBoxYes := bootstrap.NewButton(bootstrap.ButtonPrimary, "Yes, submit with empty address")
-	confirmBoxNo := bootstrap.NewButton(bootstrap.ButtonPrimary, "No, cancel submission")
+	confirmBoxText := bootstrap.NewElement("span", "", gowd.NewText("You did not supply a nominator wallet address. If you sent your November compensation to your validator wallet address, then you may continue. Otherwise, you should cancel and add a validator wallet address."))
+	confirmBoxYes := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
+	confirmBoxNo := bootstrap.NewButton(bootstrap.ButtonPrimary, "Cancel")
 	confirmBox := bootstrap.NewElement("div", "confirmBox", confirmBoxText, confirmBoxYes, confirmBoxNo)
 
 	confirmBoxYes.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
@@ -79,7 +79,7 @@ func buildPage() error {
 	confirmBoxNo.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
 		confirmBox.Hide()
 		shade.Hide()
-		nominatorWalletInput.SetAttribute("style", "background: #ffffba;border:6px solid #ffffba;margin:-6px -6px 14px;")
+		nominatorWalletInput.SetAttribute("style", "background: #ffffba;border:6px solid #ffffba;margin:-6px -6px 9px;")
 	})
 	body.AddElement(confirmBox)
 	confirmBox.Hide()
@@ -264,7 +264,7 @@ WinPrint.close();`)
 	form.SetAttribute("style", "margin-top:35px")
 
 	h1 := bootstrap.NewElement("h1", "")
-	h1.SetText("xx network MainNet Commitments")
+	h1.SetText("xx network MainNet Wallet Commitment")
 	logo := bootstrap.NewElement("img", "logo")
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)
