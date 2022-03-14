@@ -106,6 +106,7 @@ p.contractText {
     display: block;
     margin: 10px;
     background: darkred;
+    overflow-wrap: break-word;
 }
 
 .success {

@@ -64,9 +64,9 @@ func buildPage() error {
 
 	shade := bootstrap.NewElement("div", "shade")
 	body.AddElement(shade)
-	confirmBoxText := bootstrap.NewElement("span", "", gowd.NewText("You did not supply a nominator wallet address. If you sent your November compensation to your validator wallet address, then you may continue. Otherwise, you should cancel and add a validator wallet address."))
-	confirmBoxYes := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
-	confirmBoxNo := bootstrap.NewButton(bootstrap.ButtonPrimary, "Cancel")
+	confirmBoxText := bootstrap.NewElement("span", "", gowd.NewText("You did not supply a nominator wallet address. The only coins that will be used to calculate your MainNet team multiplier are those in your validator wallet. Are you sure you would like to proceed?"))
+	confirmBoxYes := bootstrap.NewButton(bootstrap.ButtonPrimary, "Yes")
+	confirmBoxNo := bootstrap.NewButton(bootstrap.ButtonPrimary, "No")
 	confirmBox := bootstrap.NewElement("div", "confirmBox", confirmBoxText, confirmBoxYes, confirmBoxNo)
 
 	confirmBoxYes.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {

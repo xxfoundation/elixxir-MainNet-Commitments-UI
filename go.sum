@@ -58,6 +58,8 @@ git.xx.network/elixxir/mainnet-commitments v0.0.0-20220307232322-ad95d9cdc769 h1
 git.xx.network/elixxir/mainnet-commitments v0.0.0-20220307232322-ad95d9cdc769/go.mod h1:eTB7pgwrQevumi/pO01Kp7qxjp1vEKcblsWsH/VohGU=
 git.xx.network/elixxir/mainnet-commitments v0.0.0-20220314181931-18b0ad496e11 h1:tXtAgHRS51isfQNfWvQg04T4wjfI5yXxiJ2alW6yF+I=
 git.xx.network/elixxir/mainnet-commitments v0.0.0-20220314181931-18b0ad496e11/go.mod h1:eTB7pgwrQevumi/pO01Kp7qxjp1vEKcblsWsH/VohGU=
+git.xx.network/elixxir/mainnet-commitments v0.0.0-20220314204235-f405ce746e1d h1:HB0cyRy0jEKeUF3+9pSaZWOlXTu2QfhoLkY0r+yxeXg=
+git.xx.network/elixxir/mainnet-commitments v0.0.0-20220314204235-f405ce746e1d/go.mod h1:eTB7pgwrQevumi/pO01Kp7qxjp1vEKcblsWsH/VohGU=
 github.com/Azure/azure-pipeline-go v0.2.1/go.mod h1:UGSo8XybXnIGZ3epmeBw7Jdz+HiUVpqIlpz/HKHylF4=
 github.com/Azure/azure-pipeline-go v0.2.2/go.mod h1:4rQ/NZncSvGqNkkOsNpOU1tgoNuIlp9AfUH5G1tvCHc=
 github.com/Azure/azure-storage-blob-go v0.7.0/go.mod h1:f9YQKtsG1nMisotuTPpO0tjNuEjKRYAcJU8/ydDI++4=
