@@ -274,7 +274,7 @@ WinPrint.close();`)
 	instructionPageLink.RemoveAttribute("href")
 	instructionPageLink.SetAttribute("style", "cursor:pointer;")
 	instructionPageLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		gowd.ExecJSNow("window.nw.Shell.openExternal('https://xx.network/november-betanet-compensation-applet-instructions/')")
+		gowd.ExecJSNow("window.nw.Shell.openExternal('https://xx.network/mainnet-commit-wallet/')")
 	})
 	p.AddElement(instructionPageLink)
 	p.AddElement(gowd.NewText("."))
