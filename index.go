@@ -64,7 +64,7 @@ func buildPage() error {
 
 	shade := bootstrap.NewElement("div", "shade")
 	body.AddElement(shade)
-	confirmBoxText := bootstrap.NewElement("span", "", gowd.NewText("You did not supply a Validator Wallet Address. You may continue without it, but then.... Are you sure you want to continue without a Validator Wallet Address?"))
+	confirmBoxText := bootstrap.NewElement("span", "", gowd.NewText("You did not supply a nominator wallet address. You may continue without it, but then.... Are you sure you want to continue without a nominator wallet address?"))
 	confirmBoxYes := bootstrap.NewButton(bootstrap.ButtonPrimary, "Yes, submit with empty address")
 	confirmBoxNo := bootstrap.NewButton(bootstrap.ButtonPrimary, "No, cancel submission")
 	confirmBox := bootstrap.NewElement("div", "confirmBox", confirmBoxText, confirmBoxYes, confirmBoxNo)
@@ -79,14 +79,14 @@ func buildPage() error {
 	confirmBoxNo.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
 		confirmBox.Hide()
 		shade.Hide()
-		validatorWalletInput.SetAttribute("style", "background: #ffffba;border:6px solid #ffffba;margin:-6px;")
+		nominatorWalletInput.SetAttribute("style", "background: #ffffba;border:6px solid #ffffba;margin:-6px -6px 14px;")
 	})
 	body.AddElement(confirmBox)
 	confirmBox.Hide()
 	shade.Hide()
 
 	submit.OnEvent(gowd.OnClick, func(_ *gowd.Element, event *gowd.EventElement) {
-		validatorWalletInput.RemoveAttribute("style")
+		nominatorWalletInput.RemoveAttribute("style")
 		submit.Disable()
 		body.Disable()
 		spinner.Hidden = false
@@ -125,8 +125,8 @@ func buildPage() error {
 		}
 		inputs.nominatorWallet = nominatorWalletInput.GetValue()
 		if len(inputs.nominatorWallet) == 0 {
-			nominatorWalletInput.SetHelpText("Required.")
-			errs++
+			// nominatorWalletInput.SetHelpText("Required.")
+			// errs++
 		} else {
 			ok, err := wallet.ValidateXXNetworkAddress(inputs.nominatorWallet)
 			if !ok || err != nil {
@@ -139,8 +139,8 @@ func buildPage() error {
 		}
 		inputs.validatorWallet = validatorWalletInput.GetValue()
 		if len(inputs.validatorWallet) == 0 {
-			// validatorWalletInput.SetHelpText("Required.")
-			// errs++
+			validatorWalletInput.SetHelpText("Required.")
+			errs++
 		} else {
 			ok, err := wallet.ValidateXXNetworkAddress(inputs.validatorWallet)
 			if !ok || err != nil {
@@ -181,7 +181,7 @@ func buildPage() error {
 				jww.ERROR.Print(err)
 			}
 
-			if inputs.validatorWallet == "" {
+			if inputs.nominatorWallet == "" {
 				confirmBox.Show()
 				shade.Show()
 			} else {
