@@ -183,3 +183,38 @@ p.contractText {
         height: 5em;
     }
 }
+
+.confirmBox {
+    position:fixed;
+    background:#fff;
+    padding: 1.5em;
+    box-shadow: 0 0 64px rgb(0 0 0 / 20%);
+    border-radius: 25px;
+    box-sizing: border-box;
+    left: 50%;
+    top: 50%;
+    transform: translatey(-50%) translateX(-50%);
+}
+
+.confirmBox span {
+    width:100%;
+    margin-bottom: 1em;
+    display: block;
+}
+
+.confirmBox button {
+    margin: 8px 8px 0;
+}
+
+.confirmBox button:first-of-type {
+    margin-left: 0;
+}
+
+.shade {
+    position: fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background: rgba(0, 0, 0, 0.25);
+}
