@@ -100,6 +100,14 @@ p.contractText {
     margin: 0 0 10px;
 }
 
+.errorBoxMessage {
+    font-size: 90%;
+    font-family: "Roboto Mono", monospace;
+    display: block;
+    margin: 10px;
+    background: darkred;
+}
+
 .success {
     font-size: 200%;
     color: green;

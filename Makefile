@@ -12,10 +12,10 @@ build:
 	go mod tidy
 
 update_release:
-	GOFLAGS="" go get git.xx.network/elixxir/mainnet-commitments@release
+	GOFLAGS="" go get git.xx.network/elixxir/mainnet-commitments@november-commitments
 
 update_master:
-	GOFLAGS="" go get git.xx.network/elixxir/mainnet-commitments@master
+	GOFLAGS="" go get git.xx.network/elixxir/mainnet-commitments@november-commitments
 
 master: update_master clean build
 

@@ -1,6 +1,6 @@
 # MainNet Commitments UI
 
-Runs the UI for MainNet commitments UI.
+Runs the UI for the November BetaNet Compensation.
 
 ### Setup:
 

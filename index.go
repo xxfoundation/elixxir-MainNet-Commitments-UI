@@ -40,7 +40,7 @@ func buildPage() error {
 	idfPathInput := formParts.NewFileButton("BetaNet Server IDF (.json)", &inputs.idfPath)
 	nominatorWalletInput := bootstrap.NewFormInput("text", "Nominator Wallet Address")
 	validatorWalletInput := bootstrap.NewFormInput("text", "Validator Wallet Address")
-	serverCertPathInput := formParts.NewFileButton("BetaNet Server Certificate (.crt)", &inputs.serverCertPath)
+	serverCertPathInput := formParts.NewFileButton("BetaNet Server Certificate (.cert or .crt)", &inputs.serverCertPath)
 
 	agreeInput := bootstrap.NewCheckBox("I agree to the contract above.", false)
 	agreeHelpText := bootstrap.NewElement("p", "help-block")
@@ -170,7 +170,8 @@ func buildPage() error {
 
 			if err != nil {
 				jww.ERROR.Printf("Submit error: %+v", err)
-				errBox.SetText(err.Error())
+				errBox.SetText("An error occurred when submitting the request. Please contact support at nodes@xx.network and provide the following error message:")
+				errBox.AddElement(bootstrap.NewElement("span", "errorBoxMessage", gowd.NewText(err.Error())))
 				errBox.Hidden = false
 				formErrors.SetText("The were errors in the form input. Please correct them to continue.")
 				formErrors.Hidden = false
@@ -261,7 +262,15 @@ WinPrint.close();`)
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)
 	p := bootstrap.NewElement("p", "blurb")
-	p.SetText(blurbText)
+	p.AddHTML(blurbText, nil)
+	instructionPageLink := bootstrap.NewLinkButton("instructions page")
+	instructionPageLink.RemoveAttribute("href")
+	instructionPageLink.SetAttribute("style", "cursor:pointer;")
+	instructionPageLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
+		gowd.ExecJSNow("window.nw.Shell.openExternal('https://xx.network/november-betanet-compensation-applet-instructions/')")
+	})
+	p.AddElement(instructionPageLink)
+	p.AddElement(gowd.NewText("."))
 	divWell.AddElement(h1)
 	divWell.AddElement(p)
 	divWell.AddElement(form)
