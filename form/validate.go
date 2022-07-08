@@ -16,9 +16,6 @@ func ValidateNodeID(str string) error {
 		return errors.New("Required.")
 	}
 
-	// TODO: undo
-	return nil
-
 	data, err := base64.StdEncoding.DecodeString(str)
 	if err != nil {
 		return err
@@ -44,9 +41,6 @@ func ValidateXXNetworkAddress(str string) error {
 		return errors.New("Required.")
 	}
 
-	// TODO: undo
-	return nil
-
 	ok, err := wallet.ValidateXXNetworkAddress(str)
 	if !ok || err != nil {
 		return errors.Errorf("Invalid wallet address: %s", err.Error())
@@ -62,9 +56,6 @@ func ValidateMultiplier(max float32) ValidateFunc {
 		if len(str) == 0 {
 			return errors.New("Required.")
 		}
-
-		// TODO: undo
-		// return nil
 
 		f64, err := strconv.ParseFloat(str, 32)
 		if err != nil {
@@ -87,9 +78,6 @@ func ValidateFilePath(str string) error {
 	if len(str) == 0 {
 		return errors.New("Required.")
 	}
-
-	// TODO: undo
-	// return nil
 
 	if _, err := utils.ReadFile(str); err != nil {
 		return err
