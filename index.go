@@ -7,6 +7,7 @@ import (
 	"github.com/dtylman/gowd/bootstrap"
 	jww "github.com/spf13/jwalterweatherman"
 	"strconv"
+	"time"
 )
 
 var body *gowd.Element
@@ -14,6 +15,7 @@ var body *gowd.Element
 const (
 	blurbTextPg1 = `This applet will allow you to commit your wallets. For more information, please see the&nbsp;`
 	blurbTextPg2 = `Below are the committed validator and nominator addresses. Select the checkbox to modify them.`
+	blurbTextPg3 = `Below is the selected team multiplier. Select the checkbox to modify it.`
 )
 const serverAddress = "https://18.185.229.39:11420"
 
@@ -52,7 +54,7 @@ func page1() *gowd.Element {
 
 	inputs := Inputs{}
 
-	nodeID := form.NewPart("text", "Node ID", form.ValidateNodeID)
+	// nodeID := form.NewPart("text", "Node ID", form.ValidateNodeID)
 	idfPathInput := form.NewFileButton("Node IDF (.json)", &inputs.idfPath, form.ValidateFilePath)
 
 	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
@@ -82,14 +84,14 @@ func page1() *gowd.Element {
 		}()
 		var errs int
 
-		if nodeID.Validate() {
-			inputs.nodeID = nodeID.GetValue()
-		} else {
-			errs++
-		}
+		// if nodeID.Validate() {
+		// 	inputs.nodeID = nodeID.GetValue()
+		// } else {
+		// 	errs++
+		// }
 
 		if idfPathInput.Validate() {
-			inputs.idfPath = nodeID.GetValue()
+			inputs.idfPath = idfPathInput.GetValue()
 		} else {
 			errs++
 		}
@@ -106,7 +108,8 @@ func page1() *gowd.Element {
 			submitNodeID := func(nodeID string) (
 				validatorWallet, nominatorWallet string,
 				selectedMultiplier, maxMultiplier float32, err error) {
-				return "validatorWallet", "nominatorWallet", 1.3, 3.5, nil
+				time.Sleep(500 * time.Millisecond)
+				return "6YLQDuXq2PkgPBQXwPPYnUyiQfJbE5Xfyu8JpmjySFz2T4sP", "6YaEntt2HKZ3ZunAZyzqBfD1xGsoRnwBdWd6Zd4yLnmwHgsg", 1.3, 3.5, nil
 			}
 
 			var err error
@@ -132,7 +135,7 @@ func page1() *gowd.Element {
 
 	formGrp := bootstrap.NewFormGroup(
 		formErrors,
-		nodeID.Element(),
+		// nodeID.Element(),
 		idfPathInput.Element,
 		submitBox,
 	)
@@ -140,7 +143,7 @@ func page1() *gowd.Element {
 	formGrp.SetAttribute("style", "margin-top:35px")
 
 	h1 := bootstrap.NewElement("h1", "")
-	h1.SetText("xx network MainNet Wallet Commitment")
+	h1.SetText("Update Team Multiplier")
 	logo := bootstrap.NewElement("img", "logo")
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)
@@ -215,7 +218,7 @@ func page2(inputs Inputs) *gowd.Element {
 			errs++
 		}
 
-		if validatorWallet.Validate() {
+		if nominatorWallet.Validate() {
 			inputs.nominatorWallet = nominatorWallet.GetValue()
 		} else {
 			errs++
@@ -248,7 +251,7 @@ func page2(inputs Inputs) *gowd.Element {
 	formGrp.SetAttribute("style", "margin-top:35px")
 
 	h1 := bootstrap.NewElement("h1", "")
-	h1.SetText("xx network MainNet Wallet Commitment")
+	h1.SetText("Update Team Multiplier")
 	logo := bootstrap.NewElement("img", "logo")
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)
@@ -265,12 +268,11 @@ func page2(inputs Inputs) *gowd.Element {
 
 func page3(inputs Inputs) *gowd.Element {
 
-	multiplier := form.NewPart("number", "Selected Multiplier", form.ValidateMultiplier(inputs.maxMultiplier))
+	multiplier := form.NewPart("number", "Selected Multiplier (Max "+strconv.FormatFloat(float64(inputs.maxMultiplier), 'f', 3, 32)+")", form.ValidateMultiplier(inputs.maxMultiplier))
 	multiplier.SetValue(strconv.FormatFloat(float64(inputs.multiplier), 'f', 3, 32))
 	multiplier.SetAttribute("min", strconv.FormatFloat(0.0, 'f', 3, 32))
 	multiplier.SetAttribute("max", strconv.FormatFloat(float64(inputs.maxMultiplier), 'f', 3, 32))
 	multiplier.SetAttribute("step", ".001")
-	multiplier.SetAttribute("pattern", `"^\d*(\.\d{0,2})?$"`)
 	multiplier.Disable()
 
 	modifyCheck := form.NewPart("checkbox", "Modify the selected multiplier", nil)
@@ -339,8 +341,10 @@ func page3(inputs Inputs) *gowd.Element {
 				formErrors.Hidden = false
 			} else {
 				divWell.RemoveElements()
-				success := bootstrap.NewElement("span", "success", gowd.NewText("MainNet Commitments Successful."+fmt.Sprintf("%+v", inputs)))
+				success := bootstrap.NewElement("span", "success", gowd.NewText("MainNet Commitments Successful."))
+				result := gowd.NewText(fmt.Sprintf("%+v", inputs))
 				divWell.AddElement(success)
+				divWell.AddElement(result)
 			}
 		} else {
 			formErrors.SetText("There were errors in the form input. Please correct them to continue.")
@@ -358,12 +362,12 @@ func page3(inputs Inputs) *gowd.Element {
 	formGrp.SetAttribute("style", "margin-top:35px")
 
 	h1 := bootstrap.NewElement("h1", "")
-	h1.SetText("xx network MainNet Wallet Commitment")
+	h1.SetText("Update Team Multiplier")
 	logo := bootstrap.NewElement("img", "logo")
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)
 	p := bootstrap.NewElement("p", "blurb")
-	p.AddHTML(blurbTextPg2, nil)
+	p.AddHTML(blurbTextPg3, nil)
 	p.AddElement(gowd.NewText("."))
 	divWell.AddElement(h1)
 	divWell.AddElement(p)
