@@ -219,3 +219,11 @@ p.contractText {
     bottom:0;
     background: rgba(0, 0, 0, 0.25);
 }
+
+input[type="checkbox"] {
+    float: left;
+    display: inline-block;
+    width: 1.3em;
+    height: 1.3em;
+    margin: 0 0.5em;
+}

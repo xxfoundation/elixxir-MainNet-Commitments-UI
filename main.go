@@ -41,9 +41,9 @@ var rootCmd = &cobra.Command{
 // init is the initialization function for Cobra which defines commands and
 // flags.
 func init() {
-	rootCmd.Flags().StringVarP(&logPath, "logPath", "l", "",
+	rootCmd.Flags().StringVarP(&logPath, "logPath", "l", "test.log",
 		"File path to save log file to.")
-	rootCmd.Flags().IntVarP(&logLevel, "logLevel", "v", 0,
+	rootCmd.Flags().IntVarP(&logLevel, "logLevel", "v", 2,
 		"Verbosity level for log printing (2+ = Trace, 1 = Debug, 0 = Info).")
 }
 

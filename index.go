@@ -1,53 +1,59 @@
 package main
 
 import (
-	"git.xx.network/elixxir/mainnet-commitments-ui/formParts"
-	"git.xx.network/elixxir/mainnet-commitments/client"
-	"git.xx.network/elixxir/mainnet-commitments/utils"
+	"fmt"
+	"git.xx.network/elixxir/mainnet-commitments-ui/form"
 	"github.com/dtylman/gowd"
 	"github.com/dtylman/gowd/bootstrap"
 	jww "github.com/spf13/jwalterweatherman"
-	"github.com/xx-labs/sleeve/wallet"
-	utils2 "gitlab.com/xx_network/primitives/utils"
 	"strconv"
 )
 
 var body *gowd.Element
 
-const blurbText = `This applet will allow you to commit your wallets. For more information, please see the&nbsp;`
+const (
+	blurbTextPg1 = `This applet will allow you to commit your wallets. For more information, please see the&nbsp;`
+	blurbTextPg2 = `Below are the committed validator and nominator addresses. Select the checkbox to modify them.`
+)
 const serverAddress = "https://18.185.229.39:11420"
 
 type Inputs struct {
-	keyPath         string
-	idfPath         string
+	nodeID          string
 	nominatorWallet string
 	validatorWallet string
-	serverCert      string
-	serverCertPath  string
+	multiplier      float32
+	maxMultiplier   float32
+	idfPath         string
 	agree           bool
 }
 
 func buildPage() error {
-
-	inputs := Inputs{}
 
 	// creates a new bootstrap fluid container
 	body = bootstrap.NewContainer(false)
 	// add some elements using the object model
 
 	// keyPathInput := bootstrap.NewFileButton(bootstrap.ButtonDefault, "keyPath", false)
-	keyPathInput := formParts.NewFileButton("BetaNet Server Key (.key)", &inputs.keyPath)
-	idfPathInput := formParts.NewFileButton("BetaNet Server IDF (.json)", &inputs.idfPath)
-	nominatorWalletInput := bootstrap.NewFormInput("text", "Nominator Wallet Address")
-	validatorWalletInput := bootstrap.NewFormInput("text", "Validator Wallet Address")
-	serverCertPathInput := formParts.NewFileButton("BetaNet Server Certificate (.cert or .crt)", &inputs.serverCertPath)
 
-	agreeInput := bootstrap.NewCheckBox("I agree to the contract above.", false)
-	agreeHelpText := bootstrap.NewElement("p", "help-block")
-	agreeHelpText.Hidden = true
-	agreeInput.AddElement(gowd.NewElement("br"))
-	agreeInput.AddElement(agreeHelpText)
-	agreeBox1 := bootstrap.NewElement("div", "form-group", agreeInput.Element)
+	row := page1()
+
+	body.AddElement(row)
+
+	// Start the UI loop
+	err := gowd.Run(body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func page1() *gowd.Element {
+
+	inputs := Inputs{}
+
+	nodeID := form.NewPart("text", "Node ID", form.ValidateNodeID)
+	idfPathInput := form.NewFileButton("Node IDF (.json)", &inputs.idfPath, form.ValidateFilePath)
 
 	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
 	errBox := bootstrap.NewElement("span", "errorBox")
@@ -62,31 +68,8 @@ func buildPage() error {
 
 	divWell := bootstrap.NewElement("div", "well")
 
-	shade := bootstrap.NewElement("div", "shade")
-	body.AddElement(shade)
-	confirmBoxText := bootstrap.NewElement("span", "", gowd.NewText("You did not supply a nominator wallet address. The only coins that will be used to calculate your MainNet team multiplier are those in your validator wallet. Are you sure you would like to proceed?"))
-	confirmBoxYes := bootstrap.NewButton(bootstrap.ButtonPrimary, "Yes")
-	confirmBoxNo := bootstrap.NewButton(bootstrap.ButtonPrimary, "No")
-	confirmBox := bootstrap.NewElement("div", "confirmBox", confirmBoxText, confirmBoxYes, confirmBoxNo)
-
-	confirmBoxYes.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		confirmBox.Hide()
-		shade.Hide()
-		spinner.Show()
-		body.Render()
-		submitContract(inputs, spinner, errBox, formErrors, divWell)
-	})
-	confirmBoxNo.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		confirmBox.Hide()
-		shade.Hide()
-		nominatorWalletInput.SetAttribute("style", "background: #ffffba;border:6px solid #ffffba;margin:-6px -6px 9px;")
-	})
-	body.AddElement(confirmBox)
-	confirmBox.Hide()
-	shade.Hide()
-
 	submit.OnEvent(gowd.OnClick, func(_ *gowd.Element, event *gowd.EventElement) {
-		nominatorWalletInput.RemoveAttribute("style")
+		jww.DEBUG.Printf("sumbit")
 		submit.Disable()
 		body.Disable()
 		spinner.Hidden = false
@@ -98,82 +81,19 @@ func buildPage() error {
 			spinner.Hidden = true
 		}()
 		var errs int
-		if len(inputs.keyPath) == 0 {
-			keyPathInput.SetHelpText("Required.")
-			errs++
-		} else {
-			keyPathInput.HideHelpText()
 
-			_, err := utils2.ReadFile(inputs.keyPath)
-			if err != nil {
-				jww.ERROR.Printf("keyPath error: %+v", err)
-				keyPathInput.SetHelpText(err.Error())
-				errs++
-			}
-		}
-		if len(inputs.idfPath) == 0 {
-			idfPathInput.SetHelpText("Required.")
+		if nodeID.Validate() {
+			inputs.nodeID = nodeID.GetValue()
+		} else {
 			errs++
-		} else {
-			idfPathInput.HideHelpText()
-			_, err := utils2.ReadFile(inputs.idfPath)
-			if err != nil {
-				jww.ERROR.Printf("idfPath error: %+v", err)
-				idfPathInput.SetHelpText(err.Error())
-				errs++
-			}
 		}
-		inputs.nominatorWallet = nominatorWalletInput.GetValue()
-		if len(inputs.nominatorWallet) == 0 {
-			// nominatorWalletInput.SetHelpText("Required.")
-			// errs++
-		} else {
-			ok, err := wallet.ValidateXXNetworkAddress(inputs.nominatorWallet)
-			if !ok || err != nil {
-				nominatorWalletInput.SetHelpText("Invalid wallet address.")
-				jww.ERROR.Printf("Invalid nominator wallet address: %+v", err)
-				errs++
-			} else if len(nominatorWalletInput.Kids) > 2 {
-				nominatorWalletInput.Kids[2].Hidden = true
-			}
-		}
-		inputs.validatorWallet = validatorWalletInput.GetValue()
-		if len(inputs.validatorWallet) == 0 {
-			validatorWalletInput.SetHelpText("Required.")
-			errs++
-		} else {
-			ok, err := wallet.ValidateXXNetworkAddress(inputs.validatorWallet)
-			if !ok || err != nil {
-				validatorWalletInput.SetHelpText("Invalid wallet address.")
-				jww.ERROR.Printf("Invalid validator wallet address: %+v", err)
-				errs++
-			} else if len(validatorWalletInput.Kids) > 2 {
-				validatorWalletInput.Kids[2].Hidden = true
-			}
-		}
-		if len(inputs.serverCertPath) == 0 {
-			serverCertPathInput.SetHelpText("Required.")
-			errs++
-		} else {
-			serverCertPathInput.HideHelpText()
 
-			data, err := utils2.ReadFile(inputs.serverCertPath)
-			if err != nil {
-				jww.ERROR.Printf("serverCertPath error: %+v", err)
-				serverCertPathInput.SetHelpText(err.Error())
-				errs++
-			} else {
-				inputs.serverCert = string(data)
-			}
-		}
-		inputs.agree = agreeInput.Checked()
-		if inputs.agree == false {
-			agreeHelpText.SetText("Required.")
-			agreeHelpText.Hidden = false
-			errs++
+		if idfPathInput.Validate() {
+			inputs.idfPath = nodeID.GetValue()
 		} else {
-			agreeHelpText.Hidden = true
+			errs++
 		}
+
 		jww.INFO.Printf("Inputs set: %+v", inputs)
 
 		if errs == 0 {
@@ -181,87 +101,43 @@ func buildPage() error {
 				jww.ERROR.Print(err)
 			}
 
-			if inputs.nominatorWallet == "" {
-				confirmBox.Show()
-				shade.Show()
+			spinner.Hidden = true
+
+			submitNodeID := func(nodeID string) (
+				validatorWallet, nominatorWallet string,
+				selectedMultiplier, maxMultiplier float32, err error) {
+				return "validatorWallet", "nominatorWallet", 1.3, 3.5, nil
+			}
+
+			var err error
+			inputs.validatorWallet, inputs.nominatorWallet, inputs.multiplier,
+				inputs.maxMultiplier, err = submitNodeID(inputs.nodeID)
+
+			if err != nil {
+				jww.ERROR.Printf("Submit error: %+v", err)
+				errBox.SetText("An error occurred when submitting the request. Please contact support at nodes@xx.network and provide the following error message:")
+				errBox.AddElement(bootstrap.NewElement("span", "errorBoxMessage", gowd.NewText(err.Error())))
+				errBox.Hidden = false
+				formErrors.SetText("The were errors in the form input. Please correct them to continue.")
+				formErrors.Hidden = false
 			} else {
-				submitContract(inputs, spinner, errBox, formErrors, divWell)
+				body.RemoveElements()
+				body.AddElement(page2(inputs))
 			}
 		} else {
-			formErrors.SetText("The were errors in the form input. Please correct them to continue.")
+			formErrors.SetText("There were errors in the form input. Please correct them to continue.")
 			formErrors.Hidden = false
 		}
 	})
 
-	contractText := bootstrap.NewElement("p", "contractText")
-	contractText.SetText("Read through the entire contract below and accept the terms.")
-
-	contract := bootstrap.NewElement("div", "contractBox", contractText)
-	contract1 := bootstrap.NewElement("div", "contractContainer")
-	contractFontSize := 100
-	contract1.SetAttribute("style", "font-size:"+strconv.Itoa(contractFontSize)+"%;")
-	_, err := contract1.AddHTML(utils.Contract, nil)
-	if err != nil {
-		return err
-	}
-	contractLink := bootstrap.NewLinkButton("Open in new window")
-	contractLink.RemoveAttribute("href")
-	contractLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		gowd.ExecJSNow(`
-let prtContent = document.getElementById("` + contract1.GetID() + `");
-let WinPrint = window.open('', '', '');
-WinPrint.document.write('<title>PARTICIPANT TERMS AND CONDITIONS FOR MAINNET TRANSITION PROGRAM</title>');
-WinPrint.document.write(prtContent.innerHTML);
-WinPrint.document.close();
-WinPrint.focus();`)
-	})
-	contractPrintLink := bootstrap.NewLinkButton("Print")
-	contractPrintLink.RemoveAttribute("href")
-	contractPrintLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		gowd.ExecJSNow(`
-let prtContent = document.getElementById("` + contract1.GetID() + `");
-let WinPrint = window.open('', '', '');
-WinPrint.document.write('<title>PARTICIPANT TERMS AND CONDITIONS FOR MAINNET TRANSITION PROGRAM</title>');
-WinPrint.document.write(prtContent.innerHTML);
-WinPrint.document.close();
-WinPrint.focus();
-WinPrint.print();
-WinPrint.close();`)
-	})
-
-	incFontSizeLink := bootstrap.NewLinkButton("+")
-	incFontSizeLink.RemoveAttribute("href")
-	incFontSizeLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		contractFontSize += 5
-		contract1.SetAttribute("style", "font-size:"+strconv.Itoa(contractFontSize)+"%;")
-	})
-	decFontSizeLink := bootstrap.NewLinkButton("-")
-	decFontSizeLink.RemoveAttribute("href")
-	decFontSizeLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		contractFontSize -= 5
-		contract1.SetAttribute("style", "font-size:"+strconv.Itoa(contractFontSize)+"%;")
-	})
-	fontSizeSpan := bootstrap.NewElement("span", "", gowd.NewText("Font size: "), incFontSizeLink, decFontSizeLink)
-	fontSizeSpan.SetAttribute("style", "float:right;font-size:92%;")
-
-	contractLinkDiv := bootstrap.NewElement("div", "contractLink", contractLink, contractPrintLink, fontSizeSpan)
-
-	contract.AddElement(contract1)
-	contract.AddElement(contractLinkDiv)
-	contract.AddElement(agreeBox1)
-
-	form := bootstrap.NewFormGroup(
+	formGrp := bootstrap.NewFormGroup(
 		formErrors,
-		serverCertPathInput.Element,
-		keyPathInput.Element,
+		nodeID.Element(),
 		idfPathInput.Element,
-		nominatorWalletInput.Element,
-		validatorWalletInput.Element,
-		contract,
 		submitBox,
 	)
 
-	form.SetAttribute("style", "margin-top:35px")
+	formGrp.SetAttribute("style", "margin-top:35px")
 
 	h1 := bootstrap.NewElement("h1", "")
 	h1.SetText("xx network MainNet Wallet Commitment")
@@ -269,7 +145,7 @@ WinPrint.close();`)
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)
 	p := bootstrap.NewElement("p", "blurb")
-	p.AddHTML(blurbText, nil)
+	p.AddHTML(blurbTextPg1, nil)
 	instructionPageLink := bootstrap.NewLinkButton("instructions page")
 	instructionPageLink.RemoveAttribute("href")
 	instructionPageLink.SetAttribute("style", "cursor:pointer;")
@@ -280,41 +156,228 @@ WinPrint.close();`)
 	p.AddElement(gowd.NewText("."))
 	divWell.AddElement(h1)
 	divWell.AddElement(p)
-	divWell.AddElement(form)
+	divWell.AddElement(formGrp)
 	row := bootstrap.NewRow(divWell)
-	body.AddElement(row)
 
-	// Start the UI loop
-	err = gowd.Run(body)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return row
 }
 
-func submitContract(inputs Inputs, spinner, errBox, formErrors, divWell *gowd.Element) {
-	err := client.SignAndTransmit(
-		inputs.keyPath,
-		inputs.idfPath,
-		inputs.nominatorWallet,
-		inputs.validatorWallet,
-		serverAddress,
-		inputs.serverCert,
-		utils.Contract)
+func page2(inputs Inputs) *gowd.Element {
 
+	validatorWallet := form.NewPart("text", "Validator Wallet Address", form.ValidateXXNetworkAddress)
+	validatorWallet.SetValue(inputs.validatorWallet)
+	validatorWallet.Disable()
+	nominatorWallet := form.NewPart("text", "Nominator Wallet Address", form.ValidateXXNetworkAddress)
+	nominatorWallet.SetValue(inputs.nominatorWallet)
+	nominatorWallet.Disable()
+
+	modifyCheck := form.NewPart("checkbox", "Modify Wallet Addresses", nil)
+	modifyCheck.OnEvent(gowd.OnClick, func(sender *gowd.Element, event *gowd.EventElement) {
+		if modifyCheck.Checked() {
+			validatorWallet.Enable()
+			nominatorWallet.Enable()
+		} else {
+			validatorWallet.Disable()
+			nominatorWallet.Disable()
+		}
+	})
+
+	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
+	errBox := bootstrap.NewElement("span", "errorBox")
+	errBox.Hidden = true
+	spinner := bootstrap.NewElement("div", "spinnerContainer", bootstrap.NewElement("div", "spinner", gowd.NewText("Loading...")))
 	spinner.Hidden = true
+	submitBox := bootstrap.NewElement("div", "", errBox, spinner, submit)
+	submitBox.SetAttribute("style", "text-align:center;")
 
+	formErrors := bootstrap.NewElement("p", "formErrors")
+	formErrors.Hidden = true
+
+	divWell := bootstrap.NewElement("div", "well")
+
+	submit.OnEvent(gowd.OnClick, func(_ *gowd.Element, event *gowd.EventElement) {
+		jww.DEBUG.Printf("sumbit")
+		submit.Disable()
+		body.Disable()
+		spinner.Hidden = false
+		formErrors.Hidden = true
+		errBox.Hidden = true
+		defer func() {
+			body.Enable()
+			submit.Enable()
+			spinner.Hidden = true
+		}()
+		var errs int
+
+		if validatorWallet.Validate() {
+			inputs.validatorWallet = validatorWallet.GetValue()
+		} else {
+			errs++
+		}
+
+		if validatorWallet.Validate() {
+			inputs.nominatorWallet = nominatorWallet.GetValue()
+		} else {
+			errs++
+		}
+		jww.INFO.Printf("Inputs set: %+v", inputs)
+
+		if errs == 0 {
+			if err := body.Render(); err != nil {
+				jww.ERROR.Print(err)
+			}
+
+			spinner.Hidden = true
+
+			body.RemoveElements()
+			body.AddElement(page3(inputs))
+		} else {
+			formErrors.SetText("There were errors in the form input. Please correct them to continue.")
+			formErrors.Hidden = false
+		}
+	})
+
+	formGrp := bootstrap.NewFormGroup(
+		formErrors,
+		modifyCheck.Element(),
+		validatorWallet.Element(),
+		nominatorWallet.Element(),
+		submitBox,
+	)
+
+	formGrp.SetAttribute("style", "margin-top:35px")
+
+	h1 := bootstrap.NewElement("h1", "")
+	h1.SetText("xx network MainNet Wallet Commitment")
+	logo := bootstrap.NewElement("img", "logo")
+	logo.SetAttribute("src", "img/xx-logo.svg")
+	h1.AddElement(logo)
+	p := bootstrap.NewElement("p", "blurb")
+	p.AddHTML(blurbTextPg2, nil)
+	p.AddElement(gowd.NewText("."))
+	divWell.AddElement(h1)
+	divWell.AddElement(p)
+	divWell.AddElement(formGrp)
+	row := bootstrap.NewRow(divWell)
+
+	return row
+}
+
+func page3(inputs Inputs) *gowd.Element {
+
+	multiplier := form.NewPart("number", "Selected Multiplier", form.ValidateMultiplier(inputs.maxMultiplier))
+	multiplier.SetValue(strconv.FormatFloat(float64(inputs.multiplier), 'f', 3, 32))
+	multiplier.SetAttribute("min", strconv.FormatFloat(0.0, 'f', 3, 32))
+	multiplier.SetAttribute("max", strconv.FormatFloat(float64(inputs.maxMultiplier), 'f', 3, 32))
+	multiplier.SetAttribute("step", ".001")
+	multiplier.SetAttribute("pattern", `"^\d*(\.\d{0,2})?$"`)
+	multiplier.Disable()
+
+	modifyCheck := form.NewPart("checkbox", "Modify the selected multiplier", nil)
+	modifyCheck.OnEvent(gowd.OnClick, func(sender *gowd.Element, event *gowd.EventElement) {
+		if modifyCheck.Checked() {
+			multiplier.Enable()
+		} else {
+			multiplier.Disable()
+		}
+	})
+
+	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
+	errBox := bootstrap.NewElement("span", "errorBox")
+	errBox.Hidden = true
+	spinner := bootstrap.NewElement("div", "spinnerContainer", bootstrap.NewElement("div", "spinner", gowd.NewText("Loading...")))
+	spinner.Hidden = true
+	submitBox := bootstrap.NewElement("div", "", errBox, spinner, submit)
+	submitBox.SetAttribute("style", "text-align:center;")
+
+	formErrors := bootstrap.NewElement("p", "formErrors")
+	formErrors.Hidden = true
+
+	divWell := bootstrap.NewElement("div", "well")
+
+	submit.OnEvent(gowd.OnClick, func(_ *gowd.Element, event *gowd.EventElement) {
+		jww.DEBUG.Printf("sumbit")
+		submit.Disable()
+		body.Disable()
+		spinner.Hidden = false
+		formErrors.Hidden = true
+		errBox.Hidden = true
+		defer func() {
+			body.Enable()
+			submit.Enable()
+			spinner.Hidden = true
+		}()
+		var errs int
+
+		if multiplier.Validate() {
+			inputs.multiplier = getFloat(multiplier.GetValue())
+		} else {
+			errs++
+		}
+
+		jww.INFO.Printf("Inputs set: %+v", inputs)
+
+		if errs == 0 {
+			if err := body.Render(); err != nil {
+				jww.ERROR.Print(err)
+			}
+
+			spinner.Hidden = true
+
+			submitInputs := func(nodeID, validatorWallet, nominatorWallet string,
+				selectedMultiplier float32) error {
+				return nil
+			}
+			err := submitInputs(inputs.nodeID, inputs.validatorWallet, inputs.nominatorWallet, inputs.multiplier)
+
+			if err != nil {
+				jww.ERROR.Printf("Submit error: %+v", err)
+				errBox.SetText("An error occurred when submitting the request. Please contact support at nodes@xx.network and provide the following error message:")
+				errBox.AddElement(bootstrap.NewElement("span", "errorBoxMessage", gowd.NewText(err.Error())))
+				errBox.Hidden = false
+				formErrors.SetText("The were errors in the form input. Please correct them to continue.")
+				formErrors.Hidden = false
+			} else {
+				divWell.RemoveElements()
+				success := bootstrap.NewElement("span", "success", gowd.NewText("MainNet Commitments Successful."+fmt.Sprintf("%+v", inputs)))
+				divWell.AddElement(success)
+			}
+		} else {
+			formErrors.SetText("There were errors in the form input. Please correct them to continue.")
+			formErrors.Hidden = false
+		}
+	})
+
+	formGrp := bootstrap.NewFormGroup(
+		formErrors,
+		modifyCheck.Element(),
+		multiplier.Element(),
+		submitBox,
+	)
+
+	formGrp.SetAttribute("style", "margin-top:35px")
+
+	h1 := bootstrap.NewElement("h1", "")
+	h1.SetText("xx network MainNet Wallet Commitment")
+	logo := bootstrap.NewElement("img", "logo")
+	logo.SetAttribute("src", "img/xx-logo.svg")
+	h1.AddElement(logo)
+	p := bootstrap.NewElement("p", "blurb")
+	p.AddHTML(blurbTextPg2, nil)
+	p.AddElement(gowd.NewText("."))
+	divWell.AddElement(h1)
+	divWell.AddElement(p)
+	divWell.AddElement(formGrp)
+	row := bootstrap.NewRow(divWell)
+
+	return row
+}
+
+func getFloat(str string) float32 {
+	f, err := strconv.ParseFloat(str, 32)
 	if err != nil {
-		jww.ERROR.Printf("Submit error: %+v", err)
-		errBox.SetText("An error occurred when submitting the request. Please contact support at nodes@xx.network and provide the following error message:")
-		errBox.AddElement(bootstrap.NewElement("span", "errorBoxMessage", gowd.NewText(err.Error())))
-		errBox.Hidden = false
-		formErrors.SetText("The were errors in the form input. Please correct them to continue.")
-		formErrors.Hidden = false
-	} else {
-		divWell.RemoveElements()
-		success := bootstrap.NewElement("span", "success", gowd.NewText("MainNet Commitments Successful."))
-		divWell.AddElement(success)
+		jww.FATAL.Panicf("Failed to parse string as float %q: %+v", str, err)
 	}
+
+	return float32(f)
 }

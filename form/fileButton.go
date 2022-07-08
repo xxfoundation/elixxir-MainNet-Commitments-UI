@@ -1,8 +1,9 @@
-package formParts
+package form
 
 import (
 	"github.com/dtylman/gowd"
 	"github.com/dtylman/gowd/bootstrap"
+	jww "github.com/spf13/jwalterweatherman"
 	"path/filepath"
 )
 
@@ -19,11 +20,15 @@ type FileButton struct {
 	txt     *gowd.Element
 	lbl2    *gowd.Element
 	helpTxt *gowd.Element
+	v       ValidateFunc
+	value   *string
+	caption string
 }
 
 // NewFileButton creates a bootstrap "form-group" containing an input with a given type and caption
-func NewFileButton(caption string, value *string) *FileButton {
+func NewFileButton(caption string, value *string, v ValidateFunc) *FileButton {
 	i := new(FileButton)
+	i.v = v
 	i.Element = bootstrap.NewElement("div", "form-group")
 
 	i.lbl2 = gowd.NewElement("label")
@@ -51,6 +56,8 @@ func NewFileButton(caption string, value *string) *FileButton {
 	lbl.SetAttribute("for", i.input.GetID())
 	i.lbl2.SetAttribute("for", i.input.GetID())
 	i.helpTxt.Hidden = true
+	i.value = value
+	i.caption = caption
 
 	btn.OnEvent(gowd.OnClick, func(sender *gowd.Element, event *gowd.EventElement) {
 		gowd.ExecJSNow("document.getElementById('" + i.lbl2.GetID() + "').click();")
@@ -93,4 +100,20 @@ func (i *FileButton) GetValue() string {
 // SetFile sets the input file value
 func (i *FileButton) SetFile(value string) {
 	i.lbl2.SetText(value)
+}
+
+// Validate checks the value of the form input against the validator function.
+// If validation fails, the error is set as the help text and returns true.
+// If validations succeeds, it returns true.
+func (i *FileButton) Validate() bool {
+	err := i.v(*i.value)
+	if err != nil {
+		jww.ERROR.Printf("Failed to validate input %+v: %+v", i.caption, err)
+		i.SetHelpText(err.Error())
+		return false
+	}
+
+	i.HideHelpText()
+
+	return true
 }
