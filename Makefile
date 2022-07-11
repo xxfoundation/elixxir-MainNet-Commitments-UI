@@ -12,6 +12,6 @@ build:
 	go mod tidy
 
 update_master:
-	GOFLAGS="" go get git.xx.network/elixxir/mainnet-commitments@master
+	GOFLAGS="" go get -d git.xx.network/elixxir/mainnet-commitments@jonah/tm-change
 
 master: update_master clean build

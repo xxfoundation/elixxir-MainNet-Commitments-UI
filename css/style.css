@@ -227,3 +227,18 @@ input[type="checkbox"] {
     height: 1.3em;
     margin: 0 0.5em;
 }
+
+input.multiplier {
+    width: 7em;
+    font-size:1.5em;
+    text-align: right;
+    margin-left: 1em;
+}
+
+input.multiplier::-webkit-outer-spin-button,
+input.multiplier::-webkit-inner-spin-button { margin-left: 1.1em; }
+
+p.inputXX {
+    display: inline;
+    margin-left: -2.8em;
+}

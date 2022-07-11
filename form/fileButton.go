@@ -22,12 +22,12 @@ type FileButton struct {
 	lbl2    *gowd.Element
 	helpTxt *gowd.Element
 	v       ValidateFunc
-	value   *string
+	value   string
 	caption string
 }
 
 // NewFileButton creates a bootstrap "form-group" containing an input with a given type and caption
-func NewFileButton(caption string, value *string, v ValidateFunc) *FileButton {
+func NewFileButton(caption string, v ValidateFunc) *FileButton {
 	i := new(FileButton)
 	i.v = v
 	i.Element = bootstrap.NewElement("div", "form-group")
@@ -57,7 +57,6 @@ func NewFileButton(caption string, value *string, v ValidateFunc) *FileButton {
 	lbl.SetAttribute("for", i.input.GetID())
 	i.lbl2.SetAttribute("for", i.input.GetID())
 	i.helpTxt.Hidden = true
-	i.value = value
 	i.caption = caption
 
 	btn.OnEvent(gowd.OnClick, func(sender *gowd.Element, event *gowd.EventElement) {
@@ -66,7 +65,7 @@ func NewFileButton(caption string, value *string, v ValidateFunc) *FileButton {
 
 	i.input.OnEvent(gowd.OnChange, func(sender *gowd.Element, event *gowd.EventElement) {
 		i.txt2.SetText(filepath.Base(event.GetValue()))
-		*value = event.GetValue()
+		i.value = event.GetValue()
 	})
 
 	return i
@@ -90,19 +89,16 @@ func (i *FileButton) HideHelpText() {
 
 // SetValue sets the input value
 func (i *FileButton) SetValue(value string) {
-	jww.INFO.Printf("*** SetValue: %q", value)
-	jww.INFO.Printf("*** txt2 1:  %q", i.txt2.GetValue())
-	jww.INFO.Printf("*** value 1: %q", *i.value)
+	if value == "" {
+		value = "No file chosen"
+	}
 	i.txt2.SetText(filepath.Base(value))
-	*i.value = value
-
-	jww.INFO.Printf("*** txt2 2:  %q", i.txt2.GetValue())
-	jww.INFO.Printf("*** value 2: %q", *i.value)
+	i.value = value
 }
 
 // GetValue returns the input value
 func (i *FileButton) GetValue() string {
-	return *i.value
+	return i.value
 }
 
 // SetFile sets the input file value
@@ -113,15 +109,15 @@ func (i *FileButton) SetFile(value string) {
 // Validate checks the value of the form input against the validator function.
 // If validation fails, the error is set as the help text and returns true.
 // If validations succeeds, it returns true.
-func (i *FileButton) Validate() bool {
-	err := i.v(*i.value)
+func (i *FileButton) Validate() (interface{}, bool) {
+	validated, err := i.v(i.value)
 	if err != nil {
 		jww.ERROR.Printf("Failed to validate input %+v: %+v", i.caption, err)
 		i.SetHelpText(err.Error())
-		return false
+		return nil, false
 	}
 
 	i.HideHelpText()
 
-	return true
+	return validated, true
 }
