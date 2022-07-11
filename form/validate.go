@@ -16,8 +16,6 @@ func ValidateXXNetworkAddress(str string) (interface{}, error) {
 		return nil, errors.New("Required.")
 	}
 
-	return str, nil
-
 	ok, err := wallet.ValidateXXNetworkAddress(str)
 	if !ok || err != nil {
 		return nil, errors.Errorf("Invalid wallet address: %s", err.Error())
@@ -32,7 +30,6 @@ func ValidateEmail(str string) (interface{}, error) {
 	if len(str) == 0 {
 		return "", nil
 	}
-	return str, nil
 
 	_, err := mail.ParseAddress(str)
 
