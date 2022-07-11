@@ -20,12 +20,11 @@ const (
 const serverAddress = "https://18.185.229.39:11420"
 
 type Inputs struct {
-	nodeID          string
+	idfPath         string
 	nominatorWallet string
 	validatorWallet string
 	multiplier      float32
 	maxMultiplier   float32
-	idfPath         string
 	agree           bool
 }
 
@@ -37,7 +36,8 @@ func buildPage() error {
 
 	// keyPathInput := bootstrap.NewFileButton(bootstrap.ButtonDefault, "keyPath", false)
 
-	row := page1()
+	inputs := Inputs{}
+	row := page1(inputs)
 
 	body.AddElement(row)
 
@@ -50,12 +50,13 @@ func buildPage() error {
 	return nil
 }
 
-func page1() *gowd.Element {
-
-	inputs := Inputs{}
+func page1(inputs Inputs) *gowd.Element {
 
 	// nodeID := form.NewPart("text", "Node ID", form.ValidateNodeID)
 	idfPathInput := form.NewFileButton("Node IDF (.json)", &inputs.idfPath, form.ValidateFilePath)
+	if inputs.idfPath != "" {
+		idfPathInput.SetValue(inputs.idfPath)
+	}
 
 	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
 	errBox := bootstrap.NewElement("span", "errorBox")
@@ -84,12 +85,6 @@ func page1() *gowd.Element {
 		}()
 		var errs int
 
-		// if nodeID.Validate() {
-		// 	inputs.nodeID = nodeID.GetValue()
-		// } else {
-		// 	errs++
-		// }
-
 		if idfPathInput.Validate() {
 			inputs.idfPath = idfPathInput.GetValue()
 		} else {
@@ -114,7 +109,7 @@ func page1() *gowd.Element {
 
 			var err error
 			inputs.validatorWallet, inputs.nominatorWallet, inputs.multiplier,
-				inputs.maxMultiplier, err = submitNodeID(inputs.nodeID)
+				inputs.maxMultiplier, err = submitNodeID(inputs.idfPath)
 
 			if err != nil {
 				jww.ERROR.Printf("Submit error: %+v", err)
@@ -185,18 +180,25 @@ func page2(inputs Inputs) *gowd.Element {
 		}
 	})
 
+	back := bootstrap.NewButton(bootstrap.ButtonPrimary, "Back")
+	back.SetAttribute("style", "margin-right:1em;")
 	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
 	errBox := bootstrap.NewElement("span", "errorBox")
 	errBox.Hidden = true
 	spinner := bootstrap.NewElement("div", "spinnerContainer", bootstrap.NewElement("div", "spinner", gowd.NewText("Loading...")))
 	spinner.Hidden = true
-	submitBox := bootstrap.NewElement("div", "", errBox, spinner, submit)
+	submitBox := bootstrap.NewElement("div", "", errBox, spinner, back, submit)
 	submitBox.SetAttribute("style", "text-align:center;")
 
 	formErrors := bootstrap.NewElement("p", "formErrors")
 	formErrors.Hidden = true
 
 	divWell := bootstrap.NewElement("div", "well")
+
+	back.OnEvent(gowd.OnClick, func(sender *gowd.Element, event *gowd.EventElement) {
+		body.RemoveElements()
+		body.AddElement(page1(inputs))
+	})
 
 	submit.OnEvent(gowd.OnClick, func(_ *gowd.Element, event *gowd.EventElement) {
 		jww.DEBUG.Printf("sumbit")
@@ -330,7 +332,7 @@ func page3(inputs Inputs) *gowd.Element {
 				selectedMultiplier float32) error {
 				return nil
 			}
-			err := submitInputs(inputs.nodeID, inputs.validatorWallet, inputs.nominatorWallet, inputs.multiplier)
+			err := submitInputs(inputs.idfPath, inputs.validatorWallet, inputs.nominatorWallet, inputs.multiplier)
 
 			if err != nil {
 				jww.ERROR.Printf("Submit error: %+v", err)

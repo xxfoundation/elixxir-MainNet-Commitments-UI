@@ -18,6 +18,7 @@ type FileButton struct {
 	*gowd.Element
 	input   *gowd.Element
 	txt     *gowd.Element
+	txt2    *gowd.Element
 	lbl2    *gowd.Element
 	helpTxt *gowd.Element
 	v       ValidateFunc
@@ -37,8 +38,8 @@ func NewFileButton(caption string, value *string, v ValidateFunc) *FileButton {
 	btn.SetText("Choose File")
 	i.lbl2.AddElement(btn)
 	// btn :=  = bootstrap.NewElement("label", "labelButton")
-	txt2 := gowd.NewText("No file chosen")
-	i.lbl2.AddElement(txt2)
+	i.txt2 = gowd.NewText("No file chosen")
+	i.lbl2.AddElement(i.txt2)
 
 	lbl := gowd.NewElement("label")
 	i.txt = gowd.NewText(caption)
@@ -64,7 +65,7 @@ func NewFileButton(caption string, value *string, v ValidateFunc) *FileButton {
 	})
 
 	i.input.OnEvent(gowd.OnChange, func(sender *gowd.Element, event *gowd.EventElement) {
-		txt2.SetText(filepath.Base(event.GetValue()))
+		i.txt2.SetText(filepath.Base(event.GetValue()))
 		*value = event.GetValue()
 	})
 
@@ -89,12 +90,19 @@ func (i *FileButton) HideHelpText() {
 
 // SetValue sets the input value
 func (i *FileButton) SetValue(value string) {
-	i.input.SetAttribute("value", value)
+	jww.INFO.Printf("*** SetValue: %q", value)
+	jww.INFO.Printf("*** txt2 1:  %q", i.txt2.GetValue())
+	jww.INFO.Printf("*** value 1: %q", *i.value)
+	i.txt2.SetText(filepath.Base(value))
+	*i.value = value
+
+	jww.INFO.Printf("*** txt2 2:  %q", i.txt2.GetValue())
+	jww.INFO.Printf("*** value 2: %q", *i.value)
 }
 
 // GetValue returns the input value
 func (i *FileButton) GetValue() string {
-	return i.input.GetValue()
+	return *i.value
 }
 
 // SetFile sets the input file value
