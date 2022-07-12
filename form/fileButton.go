@@ -110,10 +110,10 @@ func (i *FileButton) SetFile(value string) {
 // If validation fails, the error is set as the help text and returns true.
 // If validations succeeds, it returns true.
 func (i *FileButton) Validate() (interface{}, bool) {
-	validated, err := i.v(i.value)
+	validated, helpText, err := i.v(i.value)
 	if err != nil {
 		jww.ERROR.Printf("Failed to validate input %+v: %+v", i.caption, err)
-		i.SetHelpText(err.Error())
+		i.SetHelpText(helpText)
 		return nil, false
 	}
 

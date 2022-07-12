@@ -128,28 +128,25 @@ avoid_reload();
 start_process();
 
 
-function changeRangeValue(val, max){
-   if (val > max) {
-       console.log("here 1")
-        document.getElementById("number").value = max;
+function changeRangeValue(val, max) {
+    val = val.replace(/\D/g, '');
+    if (val > max) {
+        val = max;
     } else if (val < 0) {
-       console.log("here 2")
-        document.getElementById("number").value = 0;
+        val = 0;
     } else if (val == "-0") {
-       console.log("here 3")
-        document.getElementById("number").value = 0;
+        val = 0;
     } else if (val % 1 != 0) {
-       console.log("here 4")
-        document.getElementById("number").value = Math.floor(val);
+        val = Math.floor(val);
     } else if (val.length > 7) {
-       console.log("here 6")
-       val = val.slice(0, 7);
-       document.getElementById("number").value = val;
-   }
-    console.log("here 7" + val)
+        val = val.slice(0, 7);
+    }
+    if (val.length > 0) {
+        document.getElementById("number").value = val;
+    }
     document.getElementById("range").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
 }
 
-function changeInputValue(val){
+function changeInputValue(val) {
     document.getElementById("number").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
 }

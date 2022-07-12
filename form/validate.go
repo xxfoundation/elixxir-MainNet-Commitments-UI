@@ -1,6 +1,7 @@
 package form
 
 import (
+	"fmt"
 	"github.com/pkg/errors"
 	"github.com/xx-labs/sleeve/wallet"
 	"gitlab.com/xx_network/primitives/id/idf"
@@ -11,89 +12,90 @@ import (
 
 // ValidateXXNetworkAddress returns an error if the xx network address is
 // invalid. This function adheres to the ValidateFunc type.
-func ValidateXXNetworkAddress(str string) (interface{}, error) {
+func ValidateXXNetworkAddress(str string) (interface{}, string, error) {
 	if len(str) == 0 {
-		return nil, errors.New("Required.")
+		return nil, "Required", errors.New("Required")
 	}
 
 	ok, err := wallet.ValidateXXNetworkAddress(str)
 	if !ok || err != nil {
-		return nil, errors.Errorf("Invalid wallet address: %s", err.Error())
+		return nil, "Invalid wallet address", errors.Errorf("Invalid wallet address: %s", err.Error())
 	}
 
-	return str, nil
+	return str, "", nil
 }
 
 // ValidateEmail returns an error if the email is invalid. This function adheres
 // to the ValidateFunc type.
-func ValidateEmail(str string) (interface{}, error) {
+func ValidateEmail(str string) (interface{}, string, error) {
 	if len(str) == 0 {
-		return "", nil
+		return "", "", nil
 	}
 
 	_, err := mail.ParseAddress(str)
 
-	return str, err
+	return str, "Invalid email address", err
 }
 
 // ValidateMultiplier returns an error if the xx network address is
 // invalid.
 func ValidateMultiplier(max uint64) ValidateFunc {
-	return func(str string) (interface{}, error) {
+	return func(str string) (interface{}, string, error) {
 		if len(str) == 0 {
-			return nil, errors.New("Required.")
+			return nil, "Required", errors.New("Required")
 		}
 
 		u64, err := strconv.ParseUint(str, 10, 64)
 		if err != nil {
-			return nil, err
+			return nil, "Invalid integer", err
 		}
 
 		if u64 < 0 || u64 > max {
-			return nil, errors.Errorf(
+			helpText := fmt.Sprintf("Must be between %d and %d", 0, max)
+			return nil, helpText, errors.Errorf(
 				"value must be between %d and %d", 0, max)
 		}
 
-		return u64, nil
+		return u64, "", nil
 	}
 }
 
 // ValidateFilePath returns an error if the file path is invalid. This function
 // adheres to the ValidateFunc type.
-func ValidateFilePath(str string) (interface{}, error) {
-	if len(str) == 0 {
-		return nil, errors.New("Required.")
+func ValidateFilePath(str string) (interface{}, string, error) {
+	if len(str) == 0 || str == "No file chosen" {
+		return nil, "Required", errors.New("Required")
 	}
 
 	file, err := utils.ReadFile(str)
 	if err != nil {
-		return nil, err
+		return nil, "Failed to read file", err
 	}
 
-	return file, nil
+	return file, "", nil
 }
 
 // ValidateIdfPath returns an error if the IDF file path is invalid. This
 // function adheres to the ValidateFunc type.
-func ValidateIdfPath(str string) (interface{}, error) {
-	if len(str) == 0 {
-		return nil, errors.New("Required.")
+func ValidateIdfPath(str string) (interface{}, string, error) {
+	if len(str) == 0 || str == "No file chosen" {
+		return nil, "Required", errors.New("Required")
 	}
 
 	_, nid, err := idf.UnloadIDF(str)
 	if err != nil {
-		return nil, err
+		return nil, "Failed to read IDF", err
 	}
 
-	return nid.HexEncode(), nil
+	return nid.HexEncode(), "", nil
 }
 
 // ValidateCheckbox returns an error if the checkbox is not checked. This
 // function adheres to the ValidateFunc type.
-func ValidateCheckbox(str string) (interface{}, error) {
+func ValidateCheckbox(str string) (interface{}, string, error) {
 	if len(str) == 0 {
-		return nil, errors.New("Required.")
+		return nil, "Required", errors.New("Required")
 	}
 
-	return true, nil
+	return true, "", nil
 }

@@ -9,7 +9,7 @@ import (
 // ValidateFunc is the function used to validate an input value when a form is
 // submitted. If the validation fails, an error describing why is returned. If
 // validation succeeds, nil is returned.
-type ValidateFunc func(str string) (interface{}, error)
+type ValidateFunc func(str string) (interface{}, string, error)
 
 type Part struct {
 	caption string
@@ -39,19 +39,20 @@ func (p *Part) ClearHelpText() {
 func (p *Part) Validate() (interface{}, bool) {
 	var validated interface{}
 	var err error
+	var helpText string
 	if t, _ := p.GetInputAttribute("type"); t == "checkbox" {
 		val := ""
 		if p.Checked() {
 			val = "true"
 		}
-		validated, err = p.v(val)
+		validated, helpText, err = p.v(val)
 	} else {
-		validated, err = p.v(p.f.GetValue())
+		validated, helpText, err = p.v(p.f.GetValue())
 	}
 
 	if err != nil {
 		jww.ERROR.Printf("Failed to validate input %q: %+v", p.caption, err)
-		p.SetHelpText(err.Error())
+		p.SetHelpText(helpText)
 		return nil, false
 	}
 
