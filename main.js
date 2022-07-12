@@ -141,7 +141,7 @@ function changeRangeValue(val, max) {
     } else if (val.length > 7) {
         val = val.slice(0, 7);
     }
-    if (val.length > 0) {
+    if (val.toString().length > 0) {
         document.getElementById("number").value = val;
     }
     document.getElementById("range").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);

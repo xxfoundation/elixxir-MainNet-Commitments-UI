@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"git.xx.network/elixxir/mainnet-commitments-ui/form"
+	"git.xx.network/elixxir/mainnet-commitments/client"
 	"git.xx.network/elixxir/mainnet-commitments/utils"
 	"github.com/dtylman/gowd"
 	"github.com/dtylman/gowd/bootstrap"
@@ -11,6 +12,8 @@ import (
 	"time"
 )
 
+const test = false
+
 var body *gowd.Element
 
 const (
@@ -18,7 +21,7 @@ const (
 	blurbTextPg2 = `Below are the committed validator and nominator addresses. Select the checkbox to modify them.`
 	blurbTextPg3 = `Below is the selected team stake. Select the checkbox to modify it.`
 )
-const serverAddress = "https://18.185.229.39:11420"
+const serverAddress = "http://localhost:11420"
 
 type Inputs struct {
 	certPath            string
@@ -53,7 +56,7 @@ func buildPage() error {
 	// keyPathInput := bootstrap.NewFileButton(bootstrap.ButtonDefault, "keyPath", false)
 
 	row := page1(Inputs{})
-	// row := page1(Inputs{
+	// row = page1(Inputs{
 	// 	certPath: "C:\\Users\\Jono\\Go\\src\\git.xx.network\\elixxir\\mainnet-commitments-ui\\tmp\\server.crt",
 	// 	keyPath:  "C:\\Users\\Jono\\Go\\src\\git.xx.network\\elixxir\\mainnet-commitments-ui\\tmp\\commitmenttestkey.key",
 	// 	idfPath:  "C:\\Users\\Jono\\Go\\src\\git.xx.network\\elixxir\\mainnet-commitments-ui\\tmp\\testidf.json",
@@ -85,8 +88,7 @@ func page1(inputs Inputs) *gowd.Element {
 	errBox.Hidden = true
 	spinner := bootstrap.NewElement("div", "spinnerContainer", bootstrap.NewElement("div", "spinner", gowd.NewText("Loading...")))
 	spinner.Hidden = true
-	submitBox := bootstrap.NewElement("div", "", errBox, spinner, submit)
-	submitBox.SetAttribute("style", "text-align:center;")
+	submitBox := bootstrap.NewElement("div", "submitBox", errBox, spinner, submit)
 
 	formErrors := bootstrap.NewElement("p", "formErrors")
 	formErrors.Hidden = true
@@ -137,17 +139,21 @@ func page1(inputs Inputs) *gowd.Element {
 			spinner.Hidden = true
 
 			getInfoTest := func(nid, serverCert, serverAddress string) ([]byte, error) {
-				time.Sleep(500 * time.Millisecond)
-				return []byte(`{
-    "validator-wallet": "6YLQDuXq2PkgPBQXwPPYnUyiQfJbE5Xfyu8JpmjySFz2T4sP",
-    "nominator-wallet": "6YaEntt2HKZ3ZunAZyzqBfD1xGsoRnwBdWd6Zd4yLnmwHgsg",
-    "selected-multiplier": 573,
-    "max-multiplier": 1500
-}`), nil
+				if test {
+					time.Sleep(500 * time.Millisecond)
+					return []byte(`{
+			    "validator-wallet": "6YLQDuXq2PkgPBQXwPPYnUyiQfJbE5Xfyu8JpmjySFz2T4sP",
+			    "nominator-wallet": "6YaEntt2HKZ3ZunAZyzqBfD1xGsoRnwBdWd6Zd4yLnmwHgsg",
+			    "selected-multiplier": 573,
+			    "max-multiplier": 1500,
+				"email": "johnDoe@email.com"
+			}`), nil
+				} else {
+					return client.GetInfo(nid, serverCert, serverAddress)
+				}
 			}
 
 			jsonData, err := getInfoTest(inputs.nodeIdHex, string(inputs.cert), serverAddress)
-			// jsonData, err := client.GetInfo(inputs.nodeIdHex, string(inputs.cert), serverAddress)
 
 			if err != nil {
 				jww.ERROR.Printf("Submit error: %+v", err)
@@ -158,10 +164,11 @@ func page1(inputs Inputs) *gowd.Element {
 				formErrors.Hidden = false
 			} else {
 				type jsonInfo struct {
-					ValidatorWallet    string `json:"validator-wallet"`
-					NominatorWallet    string `json:"nominator-wallet"`
-					SelectedMultiplier uint64 `json:"selected-multiplier"`
-					MaxMultiplier      uint64 `json:"max-multiplier"`
+					ValidatorWallet string `json:"validator-wallet"`
+					NominatorWallet string `json:"nominator-wallet"`
+					SelectedStake   uint64 `json:"selected-stake"`
+					MaxStake        uint64 `json:"max-stake"`
+					Email           string `json:"email"`
 				}
 
 				var info jsonInfo
@@ -180,9 +187,10 @@ func page1(inputs Inputs) *gowd.Element {
 					inputs.nominatorWallet = info.NominatorWallet
 					inputs.origValidatorWallet = info.ValidatorWallet
 					inputs.origNominatorWallet = info.NominatorWallet
-					inputs.multiplier = info.SelectedMultiplier
-					inputs.origMultiplier = info.SelectedMultiplier
-					inputs.maxMultiplier = info.MaxMultiplier
+					inputs.multiplier = info.SelectedStake
+					inputs.origMultiplier = info.SelectedStake
+					inputs.maxMultiplier = info.MaxStake
+					inputs.email = info.Email
 
 					body.RemoveElements()
 					body.AddElement(page2(inputs))
@@ -209,7 +217,7 @@ func page1(inputs Inputs) *gowd.Element {
 		submitBox,
 	)
 
-	formGrp.SetAttribute("style", "margin-top:35px")
+	formGrp.SetAttribute("style", "margin: 2.5em 0 0")
 
 	h1 := bootstrap.NewElement("h1", "")
 	h1.SetText("Update Team Stake")
@@ -247,6 +255,7 @@ func page2(inputs Inputs) *gowd.Element {
 	nominatorWallet.Disable()
 
 	modifyCheck := form.NewPart("checkbox", "Modify Wallet Addresses", nil)
+	modifyCheck.SetAttribute("style", "margin-top:3em;")
 	if inputs.walletModifyCheck {
 		modifyCheck.Check()
 		validatorWallet.Enable()
@@ -273,8 +282,7 @@ func page2(inputs Inputs) *gowd.Element {
 	errBox.Hidden = true
 	spinner := bootstrap.NewElement("div", "spinnerContainer", bootstrap.NewElement("div", "spinner", gowd.NewText("Loading...")))
 	spinner.Hidden = true
-	submitBox := bootstrap.NewElement("div", "", errBox, spinner, back, submit)
-	submitBox.SetAttribute("style", "text-align:center;")
+	submitBox := bootstrap.NewElement("div", "submitBox", errBox, spinner, back, submit)
 
 	formErrors := bootstrap.NewElement("p", "formErrors")
 	formErrors.Hidden = true
@@ -341,7 +349,7 @@ func page2(inputs Inputs) *gowd.Element {
 		submitBox,
 	)
 
-	formGrp.SetAttribute("style", "margin-top:35px")
+	formGrp.SetAttribute("style", "margin: 2.5em 0 0")
 
 	h1 := bootstrap.NewElement("h1", "")
 	h1.SetText("Update Team Stake")
@@ -363,10 +371,11 @@ func page3(inputs Inputs) *gowd.Element {
 
 	multiplier := form.NewPart("number", "Selected Stake (Max "+strconv.FormatUint(inputs.maxMultiplier, 10)+"xx): ", form.ValidateMultiplier(inputs.maxMultiplier))
 	multiplier.SetValue(strconv.FormatUint(inputs.multiplier, 10))
-	multiplier.SetInputAttribute("class", "multiplier")
+	multiplier.SetInputAttribute("class", "multiplier modifier")
 	multiplier.SetInputAttribute("step", "1")
 	multiplier.SetInputAttribute("min", "0")
 	multiplier.SetInputAttribute("max", strconv.FormatUint(inputs.maxMultiplier, 10))
+	multiplier.SetLabelAttribute("for", "number")
 	multiplier.Disable()
 
 	multiplier.AddElement(bootstrap.NewElement("p", "inputXX", gowd.NewText("xx")))
@@ -387,29 +396,6 @@ func page3(inputs Inputs) *gowd.Element {
 	slider.Disable()
 	multiplier.AddElement(slider)
 	multiplier.SwapKids(3, 4)
-
-	// var mux sync.Mutex
-
-	// multiplier.OnEvent("ontransitionend", func(*gowd.Element, *gowd.EventElement) {
-	// 	mux.Lock()
-	// 	jww.DEBUG.Printf("onfocusout")
-	// 	jww.DEBUG.Printf("M multiplier 1: %s", multiplier.GetValue())
-	// 	jww.DEBUG.Printf("M slider 1: %s", slider.GetValue())
-	// 	slider.SetValue(multiplier.GetValue())
-	// 	jww.DEBUG.Printf("M multiplier 2: %s", multiplier.GetValue())
-	// 	jww.DEBUG.Printf("M slider 2: %s\n", slider.GetValue())
-	// 	mux.Unlock()
-	// })
-	//
-	// slider.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-	// 	mux.Lock()
-	// 	jww.DEBUG.Printf("S slider 1: %s", slider.GetValue())
-	// 	jww.DEBUG.Printf("S multiplier 1: %s", slider.GetValue())
-	// 	multiplier.SetValue(slider.GetValue())
-	// 	jww.DEBUG.Printf("S slider 2: %s", slider.GetValue())
-	// 	jww.DEBUG.Printf("S multiplier 2: %s\n", slider.GetValue())
-	// 	mux.Unlock()
-	// })
 
 	modifyCheck := form.NewPart("checkbox", "Modify the selected stake", nil)
 	if inputs.multiplierModifyCheck {
@@ -437,8 +423,7 @@ func page3(inputs Inputs) *gowd.Element {
 	errBox.Hidden = true
 	spinner := bootstrap.NewElement("div", "spinnerContainer", bootstrap.NewElement("div", "spinner", gowd.NewText("Loading...")))
 	spinner.Hidden = true
-	submitBox := bootstrap.NewElement("div", "", errBox, spinner, back, submit)
-	submitBox.SetAttribute("style", "text-align:center;")
+	submitBox := bootstrap.NewElement("div", "submitBox", errBox, spinner, back, submit)
 
 	formErrors := bootstrap.NewElement("p", "formErrors")
 	formErrors.Hidden = true
@@ -496,7 +481,7 @@ func page3(inputs Inputs) *gowd.Element {
 		submitBox,
 	)
 
-	formGrp.SetAttribute("style", "margin-top:35px")
+	formGrp.SetAttribute("style", "margin: 2.5em 0 0")
 
 	h1 := bootstrap.NewElement("h1", "")
 	h1.SetText("Update Team Stake")
@@ -519,13 +504,33 @@ func page4(inputs Inputs) *gowd.Element {
 	agreeInput.SetAttribute("style", "margin-top:1em;")
 	back := bootstrap.NewButton(bootstrap.ButtonPrimary, "Back")
 	back.SetAttribute("style", "margin-right:1em;")
-	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Submit")
+	submit := bootstrap.NewButton(bootstrap.ButtonPrimary, "Sign and Submit")
 	errBox := bootstrap.NewElement("span", "errorBox")
 	errBox.Hidden = true
 	spinner := bootstrap.NewElement("div", "spinnerContainer", bootstrap.NewElement("div", "spinner", gowd.NewText("Loading...")))
 	spinner.Hidden = true
-	submitBox := bootstrap.NewElement("div", "", errBox, spinner, back, submit)
-	submitBox.SetAttribute("style", "text-align:center;")
+	submitBox := bootstrap.NewElement("div", "submitBox", errBox, spinner, back, submit)
+
+	multiplier := form.NewPart("text", "Your Selected Stake: ", form.ValidateMultiplier(inputs.maxMultiplier))
+	multiplier.SetValue(strconv.FormatUint(inputs.multiplier, 10))
+	multiplier.SetInputAttribute("class", "multiplier")
+	multiplier.SetInputAttribute("step", "1")
+	multiplier.SetInputAttribute("min", "0")
+	multiplier.SetInputAttribute("max", strconv.FormatUint(inputs.maxMultiplier, 10))
+	multiplier.SetInputAttribute("style", "margin-left:-0.75em;padding-right:1em;")
+	multiplier.SetAttribute("style", "margin:1em 0 2em;text-align:center;")
+	multiplier.SetLabelAttribute("style", "display:block;")
+	multiplier.Disable()
+
+	xx := bootstrap.NewElement("p", "inputXX", gowd.NewText("xx"))
+	xx.SetAttribute("style", "margin-left:-1.5em;")
+	multiplier.AddElement(xx)
+	multiplier.SetHelpTxtAttribute("style", "display:table;")
+	multiplier.SwapKids(2, 3)
+
+	multiplier.SetInputAttribute("id", "number")
+	multiplier.SetInputAttribute("onkeyup", "changeRangeValue(this.value, "+strconv.FormatUint(inputs.maxMultiplier, 10)+")")
+	multiplier.SetInputAttribute("onclick", "changeRangeValue(this.value, "+strconv.FormatUint(inputs.maxMultiplier, 10)+")")
 
 	formErrors := bootstrap.NewElement("p", "formErrors")
 	formErrors.Hidden = true
@@ -566,22 +571,19 @@ func page4(inputs Inputs) *gowd.Element {
 
 			spinner.Hidden = true
 
-			// err := client.SignAndTransmit(
-			// 	inputs.keyPath,
-			// 	inputs.idfPath,
-			// 	inputs.nominatorWallet,
-			// 	inputs.validatorWallet,
-			// 	serverAddress,
-			// 	string(inputs.cert),
-			// 	utils.Contract,
-			// 	inputs.email,
-			// 	float32(inputs.multiplier),
-			// )
-
-			signAndTransmitTest := func(keyPath, idfPath, nominatorWallet, validatorWallet, serverAddress, serverCert, contract, email string, selectedMultiplier float32) error {
-				time.Sleep(500 * time.Millisecond)
-				return nil
+			signAndTransmitTest := func(keyPath, idfPath, nominatorWallet,
+				validatorWallet, serverAddress, serverCert, contract,
+				email string, selectedMultiplier float32) error {
+				if test {
+					time.Sleep(500 * time.Millisecond)
+					return nil
+				} else {
+					return client.SignAndTransmit(keyPath, idfPath,
+						nominatorWallet, validatorWallet, serverAddress,
+						serverCert, contract, email, selectedMultiplier)
+				}
 			}
+
 			err := signAndTransmitTest(
 				inputs.keyPath,
 				inputs.idfPath,
@@ -710,10 +712,11 @@ WinPrint.close();`)
 	formGrp := bootstrap.NewFormGroup(
 		formErrors,
 		contract,
+		multiplier.Element(),
 		submitBox,
 	)
 
-	formGrp.SetAttribute("style", "margin-top:35px")
+	formGrp.SetAttribute("style", "margin: 2.5em 0 0")
 
 	h1 := bootstrap.NewElement("h1", "")
 	h1.SetText("Update Team Stake")

@@ -18,11 +18,18 @@ type Part struct {
 }
 
 func NewPart(inputType string, caption string, v ValidateFunc) *Part {
-	return &Part{
+	p := &Part{
 		caption: caption,
 		f:       bootstrap.NewFormInput(inputType, caption),
 		v:       v,
 	}
+
+	if inputType == "checkbox" {
+		classes, _ := p.f.GetAttribute("class")
+		p.f.SetAttribute("class", classes+" form-checkbox")
+	}
+
+	return p
 }
 
 func (p *Part) SetHelpText(help string) {
