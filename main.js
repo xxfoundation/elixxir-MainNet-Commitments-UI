@@ -126,3 +126,30 @@ if (os.platform().isWindows) {
 
 avoid_reload();
 start_process();
+
+
+function changeRangeValue(val, max){
+   if (val > max) {
+       console.log("here 1")
+        document.getElementById("number").value = max;
+    } else if (val < 0) {
+       console.log("here 2")
+        document.getElementById("number").value = 0;
+    } else if (val == "-0") {
+       console.log("here 3")
+        document.getElementById("number").value = 0;
+    } else if (val % 1 != 0) {
+       console.log("here 4")
+        document.getElementById("number").value = Math.floor(val);
+    } else if (val.length > 7) {
+       console.log("here 6")
+       val = val.slice(0, 7);
+       document.getElementById("number").value = val;
+   }
+    console.log("here 7" + val)
+    document.getElementById("range").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
+}
+
+function changeInputValue(val){
+    document.getElementById("number").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
+}

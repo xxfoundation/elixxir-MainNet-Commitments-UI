@@ -58,7 +58,7 @@ func buildPage() error {
 	// 	keyPath:  "C:\\Users\\Jono\\Go\\src\\git.xx.network\\elixxir\\mainnet-commitments-ui\\tmp\\commitmenttestkey.key",
 	// 	idfPath:  "C:\\Users\\Jono\\Go\\src\\git.xx.network\\elixxir\\mainnet-commitments-ui\\tmp\\testidf.json",
 	// })
-	// row = page3(Inputs{maxMultiplier: 1500, multiplier: 543})
+	row = page3(Inputs{maxMultiplier: 1500, multiplier: 543, origMultiplier: 543})
 
 	body.AddElement(row)
 
@@ -364,33 +364,68 @@ func page3(inputs Inputs) *gowd.Element {
 	multiplier := form.NewPart("number", "Selected Stake (Max "+strconv.FormatUint(inputs.maxMultiplier, 10)+"xx): ", form.ValidateMultiplier(inputs.maxMultiplier))
 	multiplier.SetValue(strconv.FormatUint(inputs.multiplier, 10))
 	multiplier.SetInputAttribute("class", "multiplier")
+	multiplier.SetInputAttribute("step", "1")
 	multiplier.SetInputAttribute("min", "0")
 	multiplier.SetInputAttribute("max", strconv.FormatUint(inputs.maxMultiplier, 10))
+	multiplier.Disable()
+
 	multiplier.AddElement(bootstrap.NewElement("p", "inputXX", gowd.NewText("xx")))
 	multiplier.SetHelpTxtAttribute("style", "display:table;")
 	multiplier.SwapKids(2, 3)
-	multiplier.Disable()
 
-	// multiplier.OnEvent(gowd.OnChange, func(*gowd.Element, *gowd.EventElement) {
-	// 	val := multiplier.GetValue()
-	// 	if len(val) > 7 {
-	// 		multiplier.SetValue(val[:7])
-	// 	}
-	// 	multiplier.SetInputAttribute("autofocus", "")
+	multiplier.SetInputAttribute("id", "number")
+	multiplier.SetInputAttribute("onkeyup", "changeRangeValue(this.value, "+strconv.FormatUint(inputs.maxMultiplier, 10)+")")
+	multiplier.SetInputAttribute("onclick", "changeRangeValue(this.value, "+strconv.FormatUint(inputs.maxMultiplier, 10)+")")
+
+	slider := bootstrap.NewElement("input", "stakeRange")
+	slider.SetAttribute("type", "range")
+	slider.SetAttribute("min", "0")
+	slider.SetAttribute("max", strconv.FormatUint(inputs.maxMultiplier, 10))
+	slider.SetValue(strconv.FormatUint(inputs.multiplier, 10))
+	slider.SetAttribute("id", "range")
+	slider.SetAttribute("oninput", "changeInputValue(this.value)")
+	slider.Disable()
+	multiplier.AddElement(slider)
+	multiplier.SwapKids(3, 4)
+
+	// var mux sync.Mutex
+
+	// multiplier.OnEvent("ontransitionend", func(*gowd.Element, *gowd.EventElement) {
+	// 	mux.Lock()
+	// 	jww.DEBUG.Printf("onfocusout")
+	// 	jww.DEBUG.Printf("M multiplier 1: %s", multiplier.GetValue())
+	// 	jww.DEBUG.Printf("M slider 1: %s", slider.GetValue())
+	// 	slider.SetValue(multiplier.GetValue())
+	// 	jww.DEBUG.Printf("M multiplier 2: %s", multiplier.GetValue())
+	// 	jww.DEBUG.Printf("M slider 2: %s\n", slider.GetValue())
+	// 	mux.Unlock()
+	// })
+	//
+	// slider.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
+	// 	mux.Lock()
+	// 	jww.DEBUG.Printf("S slider 1: %s", slider.GetValue())
+	// 	jww.DEBUG.Printf("S multiplier 1: %s", slider.GetValue())
+	// 	multiplier.SetValue(slider.GetValue())
+	// 	jww.DEBUG.Printf("S slider 2: %s", slider.GetValue())
+	// 	jww.DEBUG.Printf("S multiplier 2: %s\n", slider.GetValue())
+	// 	mux.Unlock()
 	// })
 
 	modifyCheck := form.NewPart("checkbox", "Modify the selected stake", nil)
 	if inputs.multiplierModifyCheck {
 		modifyCheck.Check()
 		multiplier.Enable()
+		slider.Enable()
 	}
 	modifyCheck.OnEvent(gowd.OnClick, func(sender *gowd.Element, event *gowd.EventElement) {
 		if modifyCheck.Checked() {
 			inputs.multiplierModifyCheck = true
 			multiplier.Enable()
+			slider.Enable()
 		} else {
 			inputs.multiplierModifyCheck = false
 			multiplier.Disable()
+			slider.Disable()
 			multiplier.SetValue(strconv.FormatUint(inputs.origMultiplier, 10))
 		}
 	})
@@ -568,7 +603,7 @@ func page4(inputs Inputs) *gowd.Element {
 				formErrors.Hidden = false
 			} else {
 				divWell.RemoveElements()
-				success := bootstrap.NewElement("span", "success", gowd.NewText("Successful submitted stake."))
+				success := bootstrap.NewElement("span", "success", gowd.NewText("Successful submitted commitment."))
 				// 				// result := gowd.NewText(fmt.Sprintf("%+v", inputs))
 				// 				result2 := gowd.NewElement("result2")
 				// 				_, _ = result2.AddHTML(`
