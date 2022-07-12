@@ -58,7 +58,7 @@ func buildPage() error {
 	// 	keyPath:  "C:\\Users\\Jono\\Go\\src\\git.xx.network\\elixxir\\mainnet-commitments-ui\\tmp\\commitmenttestkey.key",
 	// 	idfPath:  "C:\\Users\\Jono\\Go\\src\\git.xx.network\\elixxir\\mainnet-commitments-ui\\tmp\\testidf.json",
 	// })
-	row = page3(Inputs{maxMultiplier: 1500, multiplier: 543, origMultiplier: 543})
+	// row = page3(Inputs{maxMultiplier: 1500, multiplier: 543, origMultiplier: 543})
 
 	body.AddElement(row)
 
