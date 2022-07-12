@@ -56,12 +56,23 @@ func buildPage() error {
 	// keyPathInput := bootstrap.NewFileButton(bootstrap.ButtonDefault, "keyPath", false)
 
 	row := page1(Inputs{})
-	// row = page1(Inputs{
-	// 	certPath: "C:\\Users\\Jono\\Go\\src\\git.xx.network\\elixxir\\mainnet-commitments-ui\\tmp\\server.crt",
-	// 	keyPath:  "C:\\Users\\Jono\\Go\\src\\git.xx.network\\elixxir\\mainnet-commitments-ui\\tmp\\commitmenttestkey.key",
-	// 	idfPath:  "C:\\Users\\Jono\\Go\\src\\git.xx.network\\elixxir\\mainnet-commitments-ui\\tmp\\testidf.json",
-	// })
-	// row = page3(Inputs{maxMultiplier: 1500, multiplier: 543, origMultiplier: 543})
+	row = page3(Inputs{
+		certPath:              `C:\Users\Jono\Go\src\git.xx.network\elixxir\mainnet-commitments\client\test\server.crt`,
+		keyPath:               `C:\Users\Jono\Go\src\git.xx.network\elixxir\mainnet-commitments\client\test\commitmenttestkey.key`,
+		idfPath:               `C:\Users\Jono\Go\src\git.xx.network\elixxir\mainnet-commitments\client\test\testidf.json`,
+		nodeID:                "",
+		nominatorWallet:       "6a1TiUWcjderApE4876zGH5hbxjTbFV8sAb7sE3Tx2FfEGJt",
+		validatorWallet:       "6WtKWycWig29uFfMN1PgGGEuzwzdurvhbf7Qxu9g5RuXQ7cM",
+		origNominatorWallet:   "6a1TiUWcjderApE4876zGH5hbxjTbFV8sAb7sE3Tx2FfEGJt",
+		origValidatorWallet:   "6WtKWycWig29uFfMN1PgGGEuzwzdurvhbf7Qxu9g5RuXQ7cM",
+		agree:                 false,
+		email:                 "johndoe@example.com",
+		origMultiplier:        543,
+		multiplier:            543,
+		maxMultiplier:         8425465,
+		walletModifyCheck:     false,
+		multiplierModifyCheck: false,
+	})
 
 	body.AddElement(row)
 
@@ -154,6 +165,8 @@ func page1(inputs Inputs) *gowd.Element {
 			}
 
 			jsonData, err := getInfoTest(inputs.nodeIdHex, string(inputs.cert), serverAddress)
+
+			jww.DEBUG.Printf("JSON: %s", jsonData)
 
 			if err != nil {
 				jww.ERROR.Printf("Submit error: %+v", err)
@@ -369,13 +382,14 @@ func page2(inputs Inputs) *gowd.Element {
 
 func page3(inputs Inputs) *gowd.Element {
 
-	multiplier := form.NewPart("number", "Selected Stake (Max "+strconv.FormatUint(inputs.maxMultiplier, 10)+"xx): ", form.ValidateMultiplier(inputs.maxMultiplier))
+	multiplier := form.NewPart("number", "Selected Stake (Max "+strconv.FormatUint(inputs.maxMultiplier, 10)+" xx): ", form.ValidateMultiplier(inputs.maxMultiplier))
 	multiplier.SetValue(strconv.FormatUint(inputs.multiplier, 10))
 	multiplier.SetInputAttribute("class", "multiplier modifier")
 	multiplier.SetInputAttribute("step", "1")
 	multiplier.SetInputAttribute("min", "0")
 	multiplier.SetInputAttribute("max", strconv.FormatUint(inputs.maxMultiplier, 10))
 	multiplier.SetLabelAttribute("for", "number")
+	multiplier.SetLabelAttribute("id", "numberLabel")
 	multiplier.Disable()
 
 	multiplier.AddElement(bootstrap.NewElement("p", "inputXX", gowd.NewText("xx")))
@@ -396,6 +410,7 @@ func page3(inputs Inputs) *gowd.Element {
 	slider.Disable()
 	multiplier.AddElement(slider)
 	multiplier.SwapKids(3, 4)
+	gowd.ExecJS(`window.onload = updateRangeWidth()`)
 
 	modifyCheck := form.NewPart("checkbox", "Modify the selected stake", nil)
 	if inputs.multiplierModifyCheck {
@@ -580,7 +595,7 @@ func page4(inputs Inputs) *gowd.Element {
 				} else {
 					return client.SignAndTransmit(keyPath, idfPath,
 						nominatorWallet, validatorWallet, serverAddress,
-						serverCert, contract, email, selectedMultiplier)
+						serverCert, contract, email, int(selectedMultiplier))
 				}
 			}
 

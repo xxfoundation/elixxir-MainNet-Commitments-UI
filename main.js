@@ -150,3 +150,11 @@ function changeRangeValue(val, max) {
 function changeInputValue(val) {
     document.getElementById("number").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
 }
+
+function updateRangeWidth() {
+    let labelWidth = document.getElementById("numberLabel").offsetWidth;
+    let inputWidth = document.getElementById("number").offsetWidth;
+    let range = document.getElementsByClassName("stakeRange")[0];
+    let offsetWidth = labelWidth + inputWidth;
+    range.style.width = "calc(100% - " + offsetWidth + "px - 2.2em)"
+}
