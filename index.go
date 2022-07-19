@@ -12,14 +12,17 @@ import (
 	"time"
 )
 
-const test = false
+const test = true
 
 var body *gowd.Element
 
 const (
-	blurbTextPg1 = `This applet will allow you to commit your wallets. For more information, please see the&nbsp;`
+	blurbTextPg1 = `<p>This applet is designed to allow you to commit to and configure your team stake from the MainNet transition program.</p>
+<p>To learn more about the MainNet transition program, as well as its rules and details on its implementation, refer to&nbsp;<a onclick="window.nw.Shell.openExternal('https://xx.network/archive/mainnet-transition/')">About MainNet Transition</a>.</p>
+<p>This applet will allow you to commit your wallets, select how much team stake you would like on your node, and sign the contracts required for the MainNet transition program. For more information, please see the&nbsp;<a onclick="window.nw.Shell.openExternal('https://xx.network/mainnet-transition-program-configuration-and-commitment-applet-instructions/')">instructions page</a>.</p>
+<p>In order to confirm your ownership of your node, use your node keys from BetaNet. Please enter these keys below. They will be used locally to sign your commitment and will not leave this machine.</p>`
 	blurbTextPg2 = `Below are the committed validator and nominator addresses. Select the checkbox to modify them.`
-	blurbTextPg3 = `Below is the selected team stake. Select the checkbox to modify it.`
+	blurbTextPg3 = `Use the following field to select the amount of team stake you would like to receive. You may receive up to a maximum determined by both the network stake and how much of your BetaNet rewards you currently have staked. Optionally, you will want to stake the minim amount that will keep you in the active set to maximize your and the network as a whole's rewards.`
 )
 const serverAddress = "http://localhost:11420"
 
@@ -155,8 +158,8 @@ func page1(inputs Inputs) *gowd.Element {
 					return []byte(`{
 			    "validator-wallet": "6YLQDuXq2PkgPBQXwPPYnUyiQfJbE5Xfyu8JpmjySFz2T4sP",
 			    "nominator-wallet": "6YaEntt2HKZ3ZunAZyzqBfD1xGsoRnwBdWd6Zd4yLnmwHgsg",
-			    "selected-multiplier": 573,
-			    "max-multiplier": 1500,
+			    "selected-stake": 573,
+			    "max-stake": 1500,
 				"email": "johnDoe@email.com"
 			}`), nil
 				} else {
@@ -233,20 +236,13 @@ func page1(inputs Inputs) *gowd.Element {
 	formGrp.SetAttribute("style", "margin: 2.5em 0 0")
 
 	h1 := bootstrap.NewElement("h1", "")
-	h1.SetText("Update Team Stake")
+	h1.SetText("MainNet Transition Program Configuration and Commitment")
+	h1.SetAttribute("style", "padding-right: 50px;")
 	logo := bootstrap.NewElement("img", "logo")
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)
 	p := bootstrap.NewElement("p", "blurb")
 	p.AddHTML(blurbTextPg1, nil)
-	instructionPageLink := bootstrap.NewLinkButton("instructions page")
-	instructionPageLink.RemoveAttribute("href")
-	instructionPageLink.SetAttribute("style", "cursor:pointer;")
-	instructionPageLink.OnEvent(gowd.OnClick, func(*gowd.Element, *gowd.EventElement) {
-		gowd.ExecJSNow("window.nw.Shell.openExternal('https://xx.network/mainnet-commit-wallet/')")
-	})
-	p.AddElement(instructionPageLink)
-	p.AddElement(gowd.NewText("."))
 	divWell.AddElement(h1)
 	divWell.AddElement(p)
 	divWell.AddElement(formGrp)
@@ -365,7 +361,7 @@ func page2(inputs Inputs) *gowd.Element {
 	formGrp.SetAttribute("style", "margin: 2.5em 0 0")
 
 	h1 := bootstrap.NewElement("h1", "")
-	h1.SetText("Update Team Stake")
+	h1.SetText("Wallet Commitment")
 	logo := bootstrap.NewElement("img", "logo")
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)
@@ -734,12 +730,11 @@ WinPrint.close();`)
 	formGrp.SetAttribute("style", "margin: 2.5em 0 0")
 
 	h1 := bootstrap.NewElement("h1", "")
-	h1.SetText("Update Team Stake")
+	h1.SetText("MainNet Transition Contract")
 	logo := bootstrap.NewElement("img", "logo")
 	logo.SetAttribute("src", "img/xx-logo.svg")
 	h1.AddElement(logo)
 	p := bootstrap.NewElement("p", "blurb")
-	p.AddHTML(blurbTextPg3, nil)
 	p.AddElement(gowd.NewText("."))
 	divWell.AddElement(h1)
 	divWell.AddElement(p)

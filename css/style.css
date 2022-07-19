@@ -9,9 +9,21 @@ body {
     font-size: 95%;
 }
 
+h1 {
+    position: relative;
+}
+
 .logo {
     float: right;
     width: 35px;
+
+    top: 0;
+    position: absolute;
+    right: 0;
+}
+
+a {
+    cursor: pointer;
 }
 
 .well {
