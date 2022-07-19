@@ -24,7 +24,7 @@ const (
 	blurbTextPg2 = `Below are the committed validator and nominator addresses. Select the checkbox to modify them.`
 	blurbTextPg3 = `Use the following field to select the amount of team stake you would like to receive. You may receive up to a maximum determined by both the network stake and how much of your BetaNet rewards you currently have staked. Optionally, you will want to stake the minim amount that will keep you in the active set to maximize your and the network as a whole's rewards.`
 )
-const serverAddress = "http://localhost:11420"
+const serverAddress = "https://18.185.229.39:11420"
 
 type Inputs struct {
 	certPath            string
