@@ -14,6 +14,8 @@ import (
 
 const test = false
 
+const version = "version: 7/19/2022"
+
 var body *gowd.Element
 
 const (
@@ -246,6 +248,7 @@ func page1(inputs Inputs) *gowd.Element {
 	divWell.AddElement(h1)
 	divWell.AddElement(p)
 	divWell.AddElement(formGrp)
+	divWell.AddElement(bootstrap.NewElement("span", "version", gowd.NewText(version)))
 	row := bootstrap.NewRow(divWell)
 
 	return row
@@ -259,7 +262,7 @@ func page2(inputs Inputs) *gowd.Element {
 	validatorWallet := form.NewPart("text", "Validator Wallet Address", form.ValidateXXNetworkAddress)
 	validatorWallet.SetValue(inputs.validatorWallet)
 	validatorWallet.Disable()
-	nominatorWallet := form.NewPart("text", "Nominator Wallet Address", form.ValidateXXNetworkAddress)
+	nominatorWallet := form.NewPart("text", "Nominator Wallet Address", form.ValidateXXNetworkAddressNotRequired)
 	nominatorWallet.SetValue(inputs.nominatorWallet)
 	nominatorWallet.Disable()
 
@@ -371,6 +374,7 @@ func page2(inputs Inputs) *gowd.Element {
 	divWell.AddElement(h1)
 	divWell.AddElement(p)
 	divWell.AddElement(formGrp)
+	divWell.AddElement(bootstrap.NewElement("span", "version", gowd.NewText(version)))
 	row := bootstrap.NewRow(divWell)
 
 	return row
@@ -506,6 +510,7 @@ func page3(inputs Inputs) *gowd.Element {
 	divWell.AddElement(p)
 	divWell.AddElement(formGrp)
 	row := bootstrap.NewRow(divWell)
+	divWell.AddElement(bootstrap.NewElement("span", "version", gowd.NewText(version)))
 
 	return row
 }
@@ -739,6 +744,7 @@ WinPrint.close();`)
 	divWell.AddElement(h1)
 	divWell.AddElement(p)
 	divWell.AddElement(formGrp)
+	divWell.AddElement(bootstrap.NewElement("span", "version", gowd.NewText(version)))
 	row := bootstrap.NewRow(divWell)
 
 	return row

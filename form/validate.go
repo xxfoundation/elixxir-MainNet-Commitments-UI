@@ -25,6 +25,21 @@ func ValidateXXNetworkAddress(str string) (interface{}, string, error) {
 	return str, "", nil
 }
 
+// ValidateXXNetworkAddressNotRequired returns an error if the xx network address is
+// invalid. This function adheres to the ValidateFunc type.
+func ValidateXXNetworkAddressNotRequired(str string) (interface{}, string, error) {
+	if len(str) == 0 {
+		return str, "", nil
+	}
+
+	ok, err := wallet.ValidateXXNetworkAddress(str)
+	if !ok || err != nil {
+		return nil, "Invalid wallet address", errors.Errorf("Invalid wallet address: %s", err.Error())
+	}
+
+	return str, "", nil
+}
+
 // ValidateEmail returns an error if the email is invalid. This function adheres
 // to the ValidateFunc type.
 func ValidateEmail(str string) (interface{}, string, error) {

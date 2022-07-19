@@ -299,3 +299,12 @@ input.stakeRange[disabled] {
 div.form-group.form-checkbox label {
     font-weight: normal;
 }
+
+
+span.version {
+    float: right;
+    font-size: 0.9em;
+    color: #bbb;
+    display: block;
+    margin: 1em;
+}
