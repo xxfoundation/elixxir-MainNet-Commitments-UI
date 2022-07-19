@@ -24,7 +24,7 @@ const (
 <p>This applet will allow you to commit your wallets, select how much team stake you would like on your node, and sign the contracts required for the MainNet transition program. For more information, please see the&nbsp;<a onclick="window.nw.Shell.openExternal('https://xx.network/mainnet-transition-program-configuration-and-commitment-applet-instructions/')">instructions page</a>.</p>
 <p>In order to confirm your ownership of your node, use your node keys from BetaNet. Please enter these keys below. They will be used locally to sign your commitment and will not leave this machine.</p>`
 	blurbTextPg2 = `Below are the committed validator and nominator addresses. Select the checkbox to modify them.`
-	blurbTextPg3 = `Use the following field to select the amount of team stake you would like to receive. You may receive up to a maximum determined by both the network stake and how much of your BetaNet rewards you currently have staked. Optionally, you will want to stake the minim amount that will keep you in the active set to maximize your and the network as a whole's rewards.`
+	blurbTextPg3 = `Use the following field to select the amount of team stake you would like to receive. You may receive up to a maximum determined by both the network stake and how much of your BetaNet rewards you currently have staked. Optionally, you will want to stake the minimum amount that will keep you in the active set to maximize your and the network as a whole's rewards.`
 )
 const serverAddress = "https://18.185.229.39:11420"
 
@@ -621,7 +621,7 @@ func page4(inputs Inputs) *gowd.Element {
 				formErrors.Hidden = false
 			} else {
 				divWell.RemoveElements()
-				success := bootstrap.NewElement("span", "success", gowd.NewText("Successful submitted commitment."))
+				success := bootstrap.NewElement("span", "success", gowd.NewText("Successfully submitted commitment."))
 				// 				// result := gowd.NewText(fmt.Sprintf("%+v", inputs))
 				// 				result2 := gowd.NewElement("result2")
 				// 				_, _ = result2.AddHTML(`
