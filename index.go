@@ -165,8 +165,8 @@ func page1(inputs Inputs) *gowd.Element {
 					return []byte(`{
 			    "validator-wallet": "6YLQDuXq2PkgPBQXwPPYnUyiQfJbE5Xfyu8JpmjySFz2T4sP",
 			    "nominator-wallet": "6YaEntt2HKZ3ZunAZyzqBfD1xGsoRnwBdWd6Zd4yLnmwHgsg",
-			    "selected-stake": 457,
-			    "max-stake": 1500,
+			    "selected-stake": 4507,
+			    "max-stake": 150000,
 				"email": "johnDoe@email.com"
 			}`), nil
 				} else {
