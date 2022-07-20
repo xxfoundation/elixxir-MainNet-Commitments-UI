@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const test = true
+const test = false
 
 const version = "version: 7/20/2022"
 
@@ -65,23 +65,23 @@ func buildPage() error {
 	}
 
 	row := page1(Inputs{})
-	row = page3(Inputs{
-		certPath:              `C:\Users\Jono\Go\src\git.xx.network\elixxir\mainnet-commitments\client\test\server.crt`,
-		keyPath:               `C:\Users\Jono\Go\src\git.xx.network\elixxir\mainnet-commitments\client\test\commitmenttestkey.key`,
-		idfPath:               `C:\Users\Jono\Go\src\git.xx.network\elixxir\mainnet-commitments\client\test\testidf.json`,
-		nodeID:                "",
-		nominatorWallet:       "6a1TiUWcjderApE4876zGH5hbxjTbFV8sAb7sE3Tx2FfEGJt",
-		validatorWallet:       "6WtKWycWig29uFfMN1PgGGEuzwzdurvhbf7Qxu9g5RuXQ7cM",
-		origNominatorWallet:   "6a1TiUWcjderApE4876zGH5hbxjTbFV8sAb7sE3Tx2FfEGJt",
-		origValidatorWallet:   "6WtKWycWig29uFfMN1PgGGEuzwzdurvhbf7Qxu9g5RuXQ7cM",
-		agree:                 false,
-		email:                 "johndoe@example.com",
-		origMultiplier:        -6,
-		multiplier:            0,
-		maxMultiplier:         8425465,
-		walletModifyCheck:     false,
-		multiplierModifyCheck: false,
-	})
+	// row = page3(Inputs{
+	// 	certPath:              `C:\Users\Jono\Go\src\git.xx.network\elixxir\mainnet-commitments\client\test\server.crt`,
+	// 	keyPath:               `C:\Users\Jono\Go\src\git.xx.network\elixxir\mainnet-commitments\client\test\commitmenttestkey.key`,
+	// 	idfPath:               `C:\Users\Jono\Go\src\git.xx.network\elixxir\mainnet-commitments\client\test\testidf.json`,
+	// 	nodeID:                "",
+	// 	nominatorWallet:       "6a1TiUWcjderApE4876zGH5hbxjTbFV8sAb7sE3Tx2FfEGJt",
+	// 	validatorWallet:       "6WtKWycWig29uFfMN1PgGGEuzwzdurvhbf7Qxu9g5RuXQ7cM",
+	// 	origNominatorWallet:   "6a1TiUWcjderApE4876zGH5hbxjTbFV8sAb7sE3Tx2FfEGJt",
+	// 	origValidatorWallet:   "6WtKWycWig29uFfMN1PgGGEuzwzdurvhbf7Qxu9g5RuXQ7cM",
+	// 	agree:                 false,
+	// 	email:                 "johndoe@example.com",
+	// 	origMultiplier:        -6,
+	// 	multiplier:            0,
+	// 	maxMultiplier:         8425465,
+	// 	walletModifyCheck:     false,
+	// 	multiplierModifyCheck: false,
+	// })
 
 	body.AddElement(row)
 
