@@ -26,6 +26,7 @@ const (
 	blurbTextPg2 = `Below are the committed validator and nominator addresses. Select the checkbox to modify them.`
 	blurbTextPg3 = `Use the following field to select the amount of team stake you would like to receive. You may receive up to a maximum determined by both the network stake and how much of your BetaNet rewards you currently have staked. Optionally, you will want to stake the minimum amount that will keep you in the active set to maximize your and the network as a whole's rewards.`
 )
+
 const serverAddress = "https://18.185.229.39:11420"
 
 type Inputs struct {
@@ -799,44 +800,44 @@ func page4(inputs Inputs) *gowd.Element {
 				divWell.RemoveElements()
 				success := bootstrap.NewElement("span", "success", gowd.NewText("Successfully submitted commitment."))
 				// result := gowd.NewText(fmt.Sprintf("%+v", inputs))
-				result2 := gowd.NewElement("result2")
-				_, _ = result2.AddHTML(`
-				<table style=" font-family: "Roboto Mono", monospace;">
-				  <tr>
-				    <td><strong>keyPath</strong></td>
-				    <td>`+inputs.keyPath+`</td>
-				  </tr>
-				  <tr>
-				    <td><strong>idfPath</strong></td>
-				    <td>`+inputs.idfPath+`</td>
-				  </tr>
-				  <tr>
-				    <td><strong>nominatorWallet</strong></td>
-				    <td>`+inputs.nominatorWallet+`</td>
-				  </tr>
-				  <tr>
-				    <td><strong>validatorWallet</strong></td>
-				    <td>`+inputs.validatorWallet+`</td>
-				  </tr>
-				  <tr>
-				    <td><strong>serverAddress</strong></td>
-				    <td>`+serverAddress+`</td>
-				  </tr>
-				  <tr>
-				    <td><strong>cert</strong></td>
-				    <td>`+string(inputs.cert)+`</td>
-				  </tr>
-				  <tr>
-				    <td><strong>email</strong></td>
-				    <td>`+inputs.email+`</td>
-				  </tr>
-				  <tr>
-				    <td><strong>multiplier</strong></td>
-				    <td>`+strconv.Itoa(inputs.multiplier)+`</td>
-				  </tr>
-				</table>`, nil)
+				// result2 := gowd.NewElement("result2")
+				// _, _ = result2.AddHTML(`
+				// <table style=" font-family: "Roboto Mono", monospace;">
+				//   <tr>
+				//     <td><strong>keyPath</strong></td>
+				//     <td>`+inputs.keyPath+`</td>
+				//   </tr>
+				//   <tr>
+				//     <td><strong>idfPath</strong></td>
+				//     <td>`+inputs.idfPath+`</td>
+				//   </tr>
+				//   <tr>
+				//     <td><strong>nominatorWallet</strong></td>
+				//     <td>`+inputs.nominatorWallet+`</td>
+				//   </tr>
+				//   <tr>
+				//     <td><strong>validatorWallet</strong></td>
+				//     <td>`+inputs.validatorWallet+`</td>
+				//   </tr>
+				//   <tr>
+				//     <td><strong>serverAddress</strong></td>
+				//     <td>`+serverAddress+`</td>
+				//   </tr>
+				//   <tr>
+				//     <td><strong>cert</strong></td>
+				//     <td>`+string(inputs.cert)+`</td>
+				//   </tr>
+				//   <tr>
+				//     <td><strong>email</strong></td>
+				//     <td>`+inputs.email+`</td>
+				//   </tr>
+				//   <tr>
+				//     <td><strong>multiplier</strong></td>
+				//     <td>`+strconv.Itoa(inputs.multiplier)+`</td>
+				//   </tr>
+				// </table>`, nil)
 				divWell.AddElement(success)
-				divWell.AddElement(result2)
+				// divWell.AddElement(result2)
 			}
 		} else {
 			formErrors.SetText("There were errors in the form input. Please correct them to continue.")
@@ -923,13 +924,4 @@ WinPrint.close();`)
 	row := bootstrap.NewRow(divWell)
 
 	return row
-}
-
-func getFloat(str string) float32 {
-	f, err := strconv.ParseFloat(str, 32)
-	if err != nil {
-		jww.FATAL.Panicf("Failed to parse string as float %q: %+v", str, err)
-	}
-
-	return float32(f)
 }
