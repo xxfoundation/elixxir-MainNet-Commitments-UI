@@ -5,7 +5,7 @@ body {
 
 .contractLink a {
     cursor: pointer;
-    padding:0 5px;
+    padding: 0 5px;
     font-size: 95%;
 }
 
@@ -55,7 +55,7 @@ a {
     margin: 0 5px 0 0;
 }
 
-input[type=text], input[type=number]  {
+input[type=text], input[type=number] {
     font-family: "Roboto Mono", monospace;
 }
 
@@ -84,13 +84,13 @@ p.help-block {
 }
 
 div.submitBox {
-    text-align:center;
-    margin-top:2em;
+    text-align: center;
+    margin-top: 2em;
 }
 
 div.submitBox button {
-    text-align:center;
-    margin-top:1em;
+    text-align: center;
+    margin-top: 1em;
 }
 
 div.contractContainer {
@@ -145,7 +145,7 @@ p.contractText {
 }
 
 .spinnerContainer {
-    height:5em;
+    height: 5em;
     margin-top: 4em;
 }
 
@@ -213,8 +213,8 @@ p.contractText {
 }
 
 .confirmBox {
-    position:fixed;
-    background:#fff;
+    position: fixed;
+    background: #fff;
     padding: 1.5em;
     box-shadow: 0 0 64px rgb(0 0 0 / 20%);
     border-radius: 25px;
@@ -225,7 +225,7 @@ p.contractText {
 }
 
 .confirmBox span {
-    width:100%;
+    width: 100%;
     margin-bottom: 1em;
     display: block;
 }
@@ -240,26 +240,25 @@ p.contractText {
 
 .shade {
     position: fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.25);
 }
 
-input[type="checkbox"] {
+input[type="checkbox"], input[type="radio"] {
     float: left;
     display: inline-block;
     width: 1.3em;
     height: 1.3em;
-    margin:0 0.5em 0 0;
+    margin: 0 0.5em 0 0;
 }
 
 input.multiplier {
     width: 8em;
-    font-size:1.5em;
+    font-size: 1.5em;
     text-align: right;
-    margin-left: 0.5em;
 }
 
 input.multiplier.modifier[disabled] {
@@ -267,7 +266,9 @@ input.multiplier.modifier[disabled] {
 }
 
 input.multiplier::-webkit-outer-spin-button,
-input.multiplier::-webkit-inner-spin-button { margin-left: 1.1em; }
+input.multiplier::-webkit-inner-spin-button {
+    margin-left: 1.1em;
+}
 
 p.inputXX {
     display: inline;
@@ -287,9 +288,9 @@ input.multiplier.modifier[disabled] ~ p.inputXX {
 input.stakeRange {
     display: block;
     margin: 0.8em 0 0.8em 2.2em;
-    width: calc(100% - 10em);
+    width: calc(100% - 14em);
     min-width: 6em;
-    float:right;
+    float: right;
 }
 
 input.stakeRange[disabled] {
@@ -300,11 +301,90 @@ div.form-group.form-checkbox label {
     font-weight: normal;
 }
 
-
 span.version {
     float: right;
     font-size: 0.9em;
     color: #bbb;
     display: block;
     margin: 1em;
+}
+
+p.warn, p.note{
+    padding-left: 6em;
+    text-indent: -4em;
+}
+
+p.warn {
+    color: #c75e00;
+}
+
+p.warn img, p.note img {
+    height: 1em;
+    margin-right: 0.3em;
+}
+
+p.selectText{
+    padding-left: 2em;
+}
+
+p.modifyCheckText{
+    padding-left: 2em;
+}
+
+img.moreInfo {
+    height: 1em;
+    margin: 0 0.3em;
+    cursor: pointer;
+}
+
+img.moreInfo:hover {
+    filter: invert(89%) sepia(3%) saturate(5%) hue-rotate(331deg) brightness(86%) contrast(84%);
+}
+
+div.popupContainer {
+    width:100vw;
+    height:100vh;
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+div.popupShadow {
+    width:100vw;
+    height:100vh;
+    background: rgba(0, 0, 0, 0.25);
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+div.popupBox {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width:75%;
+    min-width: 300px;
+    padding:4em 2em 2em;
+    border-radius: 2em;
+
+    background: #fff;
+    box-shadow: 0 0 64px rgb(0 0 0 / 20%);
+}
+
+div.popupBox p.warn, div.popupBox p.note{
+    padding-left: 4em;
+    text-indent: -4em;
+}
+
+img.clearBtn {
+    height:1.5em;
+    float:right;
+    opacity: 0.5;
+    margin-top:-2.25em;
+    cursor: pointer;
+}
+
+img.clearBtn:hover {
+    opacity: 0.75;
 }

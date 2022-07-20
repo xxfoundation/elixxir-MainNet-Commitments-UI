@@ -54,24 +54,24 @@ func ValidateEmail(str string) (interface{}, string, error) {
 
 // ValidateMultiplier returns an error if the xx network address is
 // invalid.
-func ValidateMultiplier(max uint64) ValidateFunc {
+func ValidateMultiplier(max int) ValidateFunc {
 	return func(str string) (interface{}, string, error) {
 		if len(str) == 0 {
 			return nil, "Required", errors.New("Required")
 		}
 
-		u64, err := strconv.ParseUint(str, 10, 64)
+		i, err := strconv.Atoi(str)
 		if err != nil {
 			return nil, "Invalid integer", err
 		}
 
-		if u64 < 0 || u64 > max {
+		if i < -1 || i > max {
 			helpText := fmt.Sprintf("Must be between %d and %d", 0, max)
 			return nil, helpText, errors.Errorf(
 				"value must be between %d and %d", 0, max)
 		}
 
-		return u64, "", nil
+		return i, "", nil
 	}
 }
 

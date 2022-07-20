@@ -129,10 +129,9 @@ start_process();
 
 
 function changeRangeValue(val, max) {
-    val = val.replace(/\D/g, '');
     if (val > max) {
         val = max;
-    } else if (val < 0) {
+    } else if (val < -1) {
         val = 0;
     } else if (val == "-0") {
         val = 0;

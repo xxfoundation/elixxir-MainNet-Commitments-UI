@@ -24,12 +24,16 @@ func NewPart(inputType string, caption string, v ValidateFunc) *Part {
 		v:       v,
 	}
 
-	if inputType == "checkbox" {
+	if inputType == "checkbox" || inputType == "radio" {
 		classes, _ := p.f.GetAttribute("class")
 		p.f.SetAttribute("class", classes+" form-checkbox")
 	}
 
 	return p
+}
+
+func (p *Part) GetKid(i int) *gowd.Element {
+	return p.f.Kids[i]
 }
 
 func (p *Part) SetHelpText(help string) {
